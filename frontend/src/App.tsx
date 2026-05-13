@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from './context/SessionContext';
+import type { Role } from './context/SessionContext';
 import { Shell } from './components/layout/Shell';
 import { HomePage } from './pages/HomePage';
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -9,10 +10,18 @@ import { StudentDetailPage } from './pages/StudentDetailPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { FirebaseConfigError } from './components/auth/FirebaseConfigError';
 import { Spinner } from './components/shared/Spinner';
+import { ReactNode } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
 });
+
+/** Renders children only when the session role matches; otherwise redirects. */
+function RequireRole({ allowed, fallback, children }: { allowed: Role; fallback: string; children: ReactNode }) {
+  const { role } = useSession();
+  if (role !== allowed) return <Navigate to={fallback} replace />;
+  return <>{children}</>;
+}
 
 function AppRoutes() {
   const { role, isAuthenticated, isLoading, firebaseError } = useSession();
@@ -40,13 +49,35 @@ function AppRoutes() {
   return (
     <Shell>
       <Routes>
+        {/* Default redirect based on role */}
         <Route path="/" element={
           <Navigate to={role === 'admin' ? '/dashboard' : '/my'} replace />
         } />
-        <Route path="/dashboard" element={<AdminDashboard />} />
-        <Route path="/student/:id" element={<StudentDetailPage />} />
-        <Route path="/alerts" element={<AlertsPage />} />
-        <Route path="/my" element={<StudentDashboard />} />
+
+        {/* Admin-only routes */}
+        <Route path="/dashboard" element={
+          <RequireRole allowed="admin" fallback="/my">
+            <AdminDashboard />
+          </RequireRole>
+        } />
+        <Route path="/student/:id" element={
+          <RequireRole allowed="admin" fallback="/my">
+            <StudentDetailPage />
+          </RequireRole>
+        } />
+        <Route path="/alerts" element={
+          <RequireRole allowed="admin" fallback="/my">
+            <AlertsPage />
+          </RequireRole>
+        } />
+
+        {/* Student-only route */}
+        <Route path="/my" element={
+          <RequireRole allowed="student" fallback="/dashboard">
+            <StudentDashboard />
+          </RequireRole>
+        } />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Shell>

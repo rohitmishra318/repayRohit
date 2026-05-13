@@ -65,10 +65,10 @@ export function HomePage() {
     loanEmiMonthly: 0,
   });
 
-  // Redirect if already logged in
+  // Redirect if already logged in — let role-based routing in App.tsx decide the page
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [isAuthenticated, isLoading, navigate]);
 
@@ -79,7 +79,8 @@ export function HomePage() {
 
     try {
       await loginWithFirebase(loginForm.email, loginForm.password);
-      navigate('/dashboard');
+      // Navigate to '/' — App.tsx will send admin → /dashboard, student → /my
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');
     } finally {

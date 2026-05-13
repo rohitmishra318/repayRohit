@@ -62,6 +62,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        // ── Admin shortcut ─────────────────────────────────────────────
+        // If the logged-in email is the admin email, grant admin role
+        // immediately — no DB record needed.
+        const ADMIN_EMAIL = 'admin@gmail.com';
+        if (user.email === ADMIN_EMAIL) {
+          setRole('admin');
+          setStudent(null);
+          setIsLoading(false);
+          console.log('Admin user detected via email — admin role granted.');
+          return;
+        }
+
         // User is logged in, fetch their student data from backend
         try {
           const token = await user.getIdToken();
@@ -111,6 +123,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         } finally {
           setIsLoading(false);
         }
+
       },
       (error) => {
         console.error('Auth state change error:', error);

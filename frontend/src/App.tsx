@@ -7,6 +7,8 @@ import { Shell } from './components/layout/Shell';
 import { HomePage } from './pages/HomePage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { StudentDashboard } from './pages/StudentDashboard';
+import { StudentProfilePage } from './pages/StudentProfilePage';
+import { AIInsightsPage } from './pages/AIInsightsPage';
 import { StudentDetailPage } from './pages/StudentDetailPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { SectorRiskPage } from './pages/SectorRiskPage';
@@ -84,10 +86,20 @@ function AppRoutes() {
           </RequireRole>
         } />
 
-        {/* Student-only route */}
+        {/* Student-only routes */}
         <Route path="/my" element={
           <RequireRole allowed="student" fallback="/dashboard">
             <StudentDashboard />
+          </RequireRole>
+        } />
+        <Route path="/my/profile" element={
+          <RequireRole allowed="student" fallback="/dashboard">
+            <StudentProfilePage />
+          </RequireRole>
+        } />
+        <Route path="/my/insights" element={
+          <RequireRole allowed="student" fallback="/dashboard">
+            <AIInsightsPage />
           </RequireRole>
         } />
 

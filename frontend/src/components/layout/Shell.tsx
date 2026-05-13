@@ -12,6 +12,8 @@ const ADMIN_NAV = [
 
 const STUDENT_NAV = [
   { to: '/my', icon: '◎', label: 'My Dashboard' },
+  { to: '/my/profile', icon: '👤', label: 'My Profile' },
+  { to: '/my/insights', icon: '🤖', label: 'AI Insights' },
 ];
 
 export function Shell({ children }: { children: ReactNode }) {

@@ -6,6 +6,8 @@ import { useTheme } from '../../context/ThemeContext';
 const ADMIN_NAV = [
   { to: '/dashboard', icon: '▦', label: 'Portfolio' },
   { to: '/alerts', icon: '⚡', label: 'Alerts' },
+  { to: '/sector-risk', icon: '📊', label: 'Sector Risk' },
+  { to: '/stress-test', icon: '📉', label: 'Stress Test' },
 ];
 
 const STUDENT_NAV = [

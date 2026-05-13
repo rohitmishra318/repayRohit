@@ -2,9 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePortfolio, useStudents } from '../hooks';
 import { PageHeader } from '../components/layout/PageHeader';
 import { KPIRibbon } from '../components/portfolio/KPIRibbon';
-import { SectorTable } from '../components/portfolio/SectorTable';
 import { AlertFeed } from '../components/portfolio/AlertFeed';
-import { StressTest } from '../components/portfolio/StressTest';
 import { Card } from '../components/shared/Card';
 import { Spinner } from '../components/shared/Spinner';
 import { RiskBadge } from '../components/shared/RiskBadge';
@@ -36,60 +34,21 @@ export function AdminDashboard() {
         {/* KPI */}
         <KPIRibbon data={portfolio} />
 
-        {/* MAP + RIGHT SIDE */}
-        <div className="grid grid-cols-12 gap-5 items-stretch auto-rows-fr">
-
-          {/* Map */}
-          <div className="col-span-12 lg:col-span-5 flex">
-            <Card className="flex flex-col w-full h-full min-h-[380px]" padding="md">
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Geographic Risk Spread</h2>
-              <div className="flex-1 min-h-0">
-                <IndiaMapImage students={students || []} />
-              </div>
-            </Card>
-          </div>
-
-          {/* Right column */}
-          <div className="col-span-12 lg:col-span-7 flex flex-col gap-5">
-
-            {/* Sector exposure */}
-            <Card className="flex flex-col h-full min-h-[180px]" padding="md">
-              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Sector Risk Exposure</h2>
-              <div className="flex items-center gap-6 mb-3 text-xs text-slate-400 dark:text-slate-500">
-                <span>Field</span>
-                <span className="flex-1">Risk level</span>
-                <span>Score</span>
-                <span>Students</span>
-              </div>
-              <div className="flex-1 min-h-0">
-                <SectorTable data={portfolio.sector_exposure} />
-              </div>
-            </Card>
-
-            {/* Alerts */}
-            <Card className="flex flex-col h-full min-h-[150px]" padding="md">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Active Alerts</h2>
-                <button
-                  onClick={() => navigate('/alerts')}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                >
-                  View all →
-                </button>
-              </div>
-              <div className="flex-1 min-h-0">
-                <AlertFeed alerts={portfolio.recent_alerts} />
-              </div>
-            </Card>
-
-          </div>
+        {/* MAP */}
+        <div className="grid grid-cols-1 gap-5">
+          <Card className="flex flex-col w-full h-full min-h-[400px]" padding="md">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3">Geographic Risk Spread</h2>
+            <div className="flex-1 min-h-0 bg-slate-50/50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800">
+              <IndiaMapImage students={students || []} />
+            </div>
+          </Card>
         </div>
 
-        {/* STUDENTS + STRESS TEST */}
-        <div className="grid grid-cols-12 gap-5 items-stretch auto-rows-fr">
+        {/* STUDENTS */}
+        <div className="grid grid-cols-1 gap-5">
 
           {/* Student table */}
-          <Card className="col-span-12 lg:col-span-7 flex flex-col h-full min-h-[300px]" padding="none">
+          <Card className="flex flex-col h-full min-h-[400px]" padding="none">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Borrower List</h2>
               <span className="text-xs text-slate-400 dark:text-slate-500">{students?.length} borrowers</span>
@@ -108,7 +67,7 @@ export function AdminDashboard() {
                 </thead>
 
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
-                  {students?.slice(0, 10).map(s => (
+                  {students?.map(s => (
                     <tr
                       key={s.student_id}
                       onClick={() => navigate(`/student/${s.student_id}`)}
@@ -124,11 +83,10 @@ export function AdminDashboard() {
                       </td>
                       <td className="px-5 py-3">
                         <span
-                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                            s.placement_status === 'placed'
-                              ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700'
-                              : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700'
-                          }`}
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.placement_status === 'placed'
+                            ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-700'
+                            : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700'
+                            }`}
                         >
                           {s.placement_status}
                         </span>
@@ -140,19 +98,6 @@ export function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </Card>
-
-          {/* Stress test */}
-          <Card className="col-span-12 lg:col-span-5 flex flex-col h-full min-h-[300px]" padding="md">
-            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Scenario Stress Test</h2>
-            <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">
-              Simulate demand shock impact on portfolio
-            </p>
-            <div className="flex-1 min-h-0">
-              {portfolio.sector_exposure.length > 0 && (
-                <StressTest sectors={portfolio.sector_exposure} />
-              )}
             </div>
           </Card>
 

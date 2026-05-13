@@ -9,6 +9,8 @@ import { AdminDashboard } from './pages/AdminDashboard';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { StudentDetailPage } from './pages/StudentDetailPage';
 import { AlertsPage } from './pages/AlertsPage';
+import { SectorRiskPage } from './pages/SectorRiskPage';
+import { StressTestPage } from './pages/StressTestPage';
 import { FirebaseConfigError } from './components/auth/FirebaseConfigError';
 import { Spinner } from './components/shared/Spinner';
 import { ReactNode } from 'react';
@@ -69,6 +71,16 @@ function AppRoutes() {
         <Route path="/alerts" element={
           <RequireRole allowed="admin" fallback="/my">
             <AlertsPage />
+          </RequireRole>
+        } />
+        <Route path="/sector-risk" element={
+          <RequireRole allowed="admin" fallback="/my">
+            <SectorRiskPage />
+          </RequireRole>
+        } />
+        <Route path="/stress-test" element={
+          <RequireRole allowed="admin" fallback="/my">
+            <StressTestPage />
           </RequireRole>
         } />
 

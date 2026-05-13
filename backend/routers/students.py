@@ -4,6 +4,7 @@ from typing import Optional
 from backend.database import get_db
 from backend.models.schema import Student, Institute
 from backend.models.schema import RiskScore
+from backend.schemas.student import StudentUpdate
 from backend.services.risk_service import get_risk_tier
 
 router = APIRouter()
@@ -72,3 +73,23 @@ async def get_student(student_id: str, db: Session = Depends(get_db)):
         "institute_tier": institute.tier if institute else None,
         "data_trust_score": float(institute.data_trust_score if institute else 0.5),
     }
+
+
+@router.patch("/{student_id}")
+async def update_student(student_id: str, payload: StudentUpdate, db: Session = Depends(get_db)):
+    student = db.query(Student).filter(Student.student_id == student_id).first()
+    if not student:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        if key == 'tenth_board_score':
+            student.tenth_board_score = value
+        elif key == 'twelfth_board_score':
+            student.twelfth_board_score = value
+        else:
+            setattr(student, key, value)
+
+    db.commit()
+    db.refresh(student)
+    return {"status": "success", "message": "Profile updated successfully"}

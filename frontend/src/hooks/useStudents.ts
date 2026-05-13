@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studentsApi } from '../api/students';
 
 export function useStudentList(filters?: { course_family?: string; risk_tier?: string }) {
@@ -21,5 +21,20 @@ export function useMyProfile() {
   return useQuery({
     queryKey: ['my-profile'],
     queryFn: () => studentsApi.getMyProfile(),
+    queryFn: () => studentsApi.getMyProfile(),
+  });
+}
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: import('../types/index').StudentUpdatePayload }) => 
+      studentsApi.updateProfile(id, data),
+    onSuccess: (_, { id }) => {
+      // Invalidate both the specific student and the general profile
+      queryClient.invalidateQueries({ queryKey: ['student', id] });
+      queryClient.invalidateQueries({ queryKey: ['my-profile'] });
+    },
   });
 }

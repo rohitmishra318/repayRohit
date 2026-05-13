@@ -9,6 +9,17 @@ class InstituteResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class StudentUpdate(BaseModel):
+    cgpa: Optional[float] = None
+    internship_count: Optional[int] = None
+    cert_count: Optional[int] = None
+    ppo_exists: Optional[bool] = None
+    tenth_board_score: Optional[float] = None
+    twelfth_board_score: Optional[float] = None
+    target_field: Optional[str] = None
+    target_city_tier: Optional[int] = None
+    months_since_graduation: Optional[int] = None
+
 class StudentResponse(BaseModel):
     student_id: str
     institute_id: str

@@ -63,6 +63,18 @@
   twelfth_board_score?: number;
 }
 
+export interface StudentUpdatePayload {
+  cgpa?: number;
+  internship_count?: number;
+  cert_count?: number;
+  ppo_exists?: boolean;
+  tenth_board_score?: number;
+  twelfth_board_score?: number;
+  target_field?: string;
+  target_city_tier?: number;
+  months_since_graduation?: number;
+}
+
 export interface ShapDriver {
   feature: string;
   direction: 'increases_risk' | 'reduces_risk';
@@ -141,4 +153,4 @@ export interface Alert {
   model_version?: any;
 }
 
-export  type { PortfolioSummary ,SectorExposure, Alert, Intervention, RiskData, BiasFlag, ShapDriver, StudentDetail, StudentListItem, AuthResponse, RegisterPayload, LoginPayload, AuthState, User, UserRole } ;
+export  type { PortfolioSummary ,SectorExposure, Alert, Intervention, RiskData, BiasFlag, ShapDriver, StudentDetail, StudentListItem, StudentUpdatePayload, AuthResponse, RegisterPayload, LoginPayload, AuthState, User, UserRole } ;

@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+/* Tell Tailwind v4 to use .dark class for dark: variants (not system preference) */
+@variant dark (&:where(.dark, .dark *));
 
 
 * {
@@ -31,4 +31,10 @@ h1, h2, h3, h4 {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+/* Prevent flash of white on dark mode */
+.dark body { background-color: #020617; /* slate-950 */ }

@@ -27,7 +27,7 @@ export function StudentDashboard() {
   // 4. Handle the Auth loading state BEFORE the Risk loading state
   if (authLoading) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-50/50">
+      <div className="flex h-full items-center justify-center bg-slate-50/50 dark:bg-slate-950">
         <Spinner size="lg" label="Authenticating student session..." />
       </div>
     );
@@ -36,7 +36,7 @@ export function StudentDashboard() {
   // 5. If they aren't logged in, don't try to render the dashboard
   if (!student) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-50/50 text-slate-500">
+      <div className="flex h-full items-center justify-center bg-slate-50/50 dark:bg-slate-950 text-slate-500 dark:text-slate-400">
         Please log in to view your dashboard.
       </div>
     );
@@ -45,7 +45,7 @@ export function StudentDashboard() {
   // Handle loading state for the entire page core metrics
   if (rLoading || iLoading) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-50/50">
+      <div className="flex h-full items-center justify-center bg-slate-50/50 dark:bg-slate-950">
         <Spinner size="lg" label="Loading live risk profile..." />
       </div>
     );
@@ -54,10 +54,10 @@ export function StudentDashboard() {
   // Handle Error state if the backend is unreachable
   if (rError || !risk) {
     return (
-      <div className="p-10 text-center max-w-md mx-auto mt-20 bg-white rounded-xl border border-red-100 shadow-sm">
+      <div className="p-10 text-center max-w-md mx-auto mt-20 bg-white dark:bg-slate-800 rounded-xl border border-red-100 dark:border-red-900 shadow-sm">
         <div className="text-red-500 mb-3 text-4xl">⚠️</div>
-        <h2 className="text-xl font-bold text-slate-800 mb-2">Connection Interrupted</h2>
-        <p className="text-sm text-slate-500">We couldn't reach the server to fetch your live risk data. Please refresh or check your connection.</p>
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">Connection Interrupted</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">We couldn't reach the server to fetch your live risk data. Please refresh or check your connection.</p>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function StudentDashboard() {
   // ... rest of your return statement stays EXACTLY the same ...
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin bg-[#FAFAFA]">
+    <div className="flex-1 overflow-y-auto scrollbar-thin bg-[#FAFAFA] dark:bg-slate-950">
       <PageHeader
         title="My Risk Dashboard"
         subtitle={`${student.name} · ${student.course} · MBA`}
@@ -80,12 +80,11 @@ export function StudentDashboard() {
         {/* ==============================================================
             SECTION 1: PROFILE RIBBON (Moved to Top)
         ============================================================== */}
-        <Card padding="md" className="border border-slate-200/60 shadow-sm bg-white">
-          <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-            <h2 className="text-sm font-semibold text-slate-800">Student Profile Snapshot</h2>
-            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">ID: {SID}</span>
+        <Card padding="md" className="border border-slate-200/60 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
+          <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Student Profile Snapshot</h2>
+            <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">ID: {SID}</span>
           </div>
-          
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
               { label: 'CGPA', value: student.cgpa.toFixed(2), icon: '🎓' },
@@ -95,11 +94,11 @@ export function StudentDashboard() {
               { label: '10th Score', value: `${student.tenth_board_score}%`, icon: '📝' },
               { label: '12th Score', value: `${student.twelfth_board_score}%`, icon: '📝' },
             ].map(item => (
-              <div key={item.label} className="flex items-center gap-3 p-3 rounded-md bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-100/50">
+              <div key={item.label} className="flex items-center gap-3 p-3 rounded-md bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-100/50 dark:border-slate-600/50">
                 <span className="text-lg opacity-80">{item.icon}</span>
                 <div>
-                  <p className="text-[11px] text-slate-500 uppercase tracking-wide">{item.label}</p>
-                  <p className="text-sm font-semibold text-slate-800">{item.value}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wide">{item.label}</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{item.value}</p>
                 </div>
               </div>
             ))}
@@ -112,38 +111,38 @@ export function StudentDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Risk Gauge */}
-          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 relative overflow-hidden" padding="md">
+          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 dark:border-slate-700 relative overflow-hidden" padding="md">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-            <h2 className="text-sm font-semibold text-slate-800 mb-4">Placement Risk</h2>
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Placement Risk</h2>
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
-                <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+                <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
                   <div>
-                    <p className="text-slate-500 mb-0.5">Repayment Stress</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-0.5">Repayment Stress</p>
                     <p className={`font-semibold ${
                       risk.repayment_stress_index >= 0.7 ? 'text-red-600' :
                       risk.repayment_stress_index >= 0.5 ? 'text-amber-600' : 'text-emerald-600'
                     }`}>{risk.repayment_stress_label || 'MODERATE'}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-0.5">Salary Range</p>
-                    <p className="font-semibold text-slate-800">
+                    <p className="text-slate-500 dark:text-slate-400 mb-0.5">Salary Range</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">
                       ₹{(risk.predicted_salary_lower / 100000).toFixed(1)}–{(risk.predicted_salary_upper / 100000).toFixed(1)}L
                     </p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-0.5">Monthly EMI</p>
-                    <p className="font-semibold text-slate-800">₹{student.loan_emi_monthly.toLocaleString('en-IN')}</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-0.5">Monthly EMI</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">₹{student.loan_emi_monthly.toLocaleString('en-IN')}</p>
                   </div>
                   <div>
-                    <p className="text-slate-500 mb-0.5">Data Trust Weight</p>
-                    <p className="font-semibold text-slate-800">{(risk.data_trust_weight * 100).toFixed(0)}%</p>
+                    <p className="text-slate-500 dark:text-slate-400 mb-0.5">Data Trust Weight</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">{(risk.data_trust_weight * 100).toFixed(0)}%</p>
                   </div>
                 </div>
               </div>
               {risk.needs_human_review && (
-                <div className="mt-4 bg-amber-50/80 border border-amber-200/80 rounded px-3 py-2 text-xs text-amber-800 flex items-start gap-2">
+                <div className="mt-4 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-700 rounded px-3 py-2 text-xs text-amber-800 dark:text-amber-400 flex items-start gap-2">
                   <span>⚠</span>
                   <span>Wide uncertainty limits — manual review recommended.</span>
                 </div>
@@ -152,18 +151,18 @@ export function StudentDashboard() {
           </Card>
 
           {/* Placement Timeline */}
-          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60" padding="md">
-            <h2 className="text-sm font-semibold text-slate-800 mb-1">Placement Timeline</h2>
-            <p className="text-xs text-slate-500 mb-4">Probability of securing a role</p>
-            <div className="flex-1 flex items-center bg-slate-50/50 rounded-lg p-2 border border-slate-100">
+          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 dark:border-slate-700" padding="md">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Placement Timeline</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Probability of securing a role</p>
+            <div className="flex-1 flex items-center bg-slate-50/50 dark:bg-slate-700/30 rounded-lg p-2 border border-slate-100 dark:border-slate-600">
                <PlacementTimeline p_3mo={risk.p_3mo} p_6mo={risk.p_6mo} p_12mo={risk.p_12mo} />
             </div>
           </Card>
 
           {/* What-If Simulator */}
-          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60" padding="md">
-            <h2 className="text-sm font-semibold text-slate-800 mb-1">What-If Simulator</h2>
-            <p className="text-xs text-slate-500 mb-4">Test potential profile improvements</p>
+          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 dark:border-slate-700" padding="md">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">What-If Simulator</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Test potential profile improvements</p>
             <div className="flex-1">
               <WhatIfSimulator
                 baseRisk={risk}
@@ -185,22 +184,22 @@ export function StudentDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* SHAP Drivers */}
-          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60" padding="md">
-            <h2 className="text-sm font-semibold text-slate-800 mb-1">Risk Drivers</h2>
-            <p className="text-xs text-slate-500 mb-4">Variables impacting current score</p>
+          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 dark:border-slate-700" padding="md">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Risk Drivers</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Variables impacting current score</p>
             <div className="flex-1">
                <ShapDrivers drivers={risk.shap_drivers} />
             </div>
           </Card>
 
           {/* AI Risk Assessment (Scrollable, Kept Exact Logic) */}
-          <Card className="border-l-4 border-l-blue-500 flex flex-col h-full min-h-[320px] max-h-[420px] shadow-sm bg-white" padding="md">
+          <Card className="border-l-4 border-l-blue-500 flex flex-col h-full min-h-[320px] max-h-[420px] shadow-sm bg-white dark:bg-slate-800" padding="md">
             <div className="flex items-center justify-between mb-1">
               <div>
-                <h2 className="text-sm font-semibold text-slate-800">AI Risk Assessment</h2>
-                <p className="text-xs text-slate-400">Deep-learning risk narrative</p>
+                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">AI Risk Assessment</h2>
+                <p className="text-xs text-slate-400 dark:text-slate-500">Deep-learning risk narrative</p>
               </div>
-              <div className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wider border border-blue-100">
+              <div className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded uppercase tracking-wider border border-blue-100 dark:border-blue-700">
                 Logic: Conformal
               </div>
             </div>
@@ -278,9 +277,9 @@ export function StudentDashboard() {
           </Card>
 
           {/* Interventions */}
-          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60" padding="md">
-            <h2 className="text-sm font-semibold text-slate-800 mb-1">Recommended Actions</h2>
-            <p className="text-xs text-slate-500 mb-4">Ranked by placement lift estimate</p>
+          <Card className="h-full flex flex-col shadow-sm border border-slate-200/60 dark:border-slate-700" padding="md">
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Recommended Actions</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Ranked by placement lift estimate</p>
             <div className="flex-1">
                <InterventionCards interventions={interventions} />
             </div>
@@ -291,12 +290,12 @@ export function StudentDashboard() {
         {/* ==============================================================
             SECTION 4: ACTIVITY FEED (Bottom Span)
         ============================================================== */}
-        <Card className="shadow-sm border border-slate-200/60" padding="md">
+        <Card className="shadow-sm border border-slate-200/60 dark:border-slate-700" padding="md">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-800">Live Activity Feed</h2>
-            <button className="text-xs text-blue-600 hover:underline">View All</button>
+            <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Live Activity Feed</h2>
+            <button className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View All</button>
           </div>
-          <div className="bg-white rounded-lg">
+          <div className="bg-white dark:bg-slate-800 rounded-lg">
              <ActivityFeed />
           </div>
         </Card>

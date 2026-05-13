@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider, useSession } from './context/SessionContext';
+import { ThemeProvider } from './context/ThemeContext';
 import type { Role } from './context/SessionContext';
 import { Shell } from './components/layout/Shell';
 import { HomePage } from './pages/HomePage';
@@ -33,10 +34,10 @@ function AppRoutes() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800">
         <div className="text-center space-y-3">
           <Spinner size="lg" label="Loading..." />
-          <p className="text-slate-600">Setting up your session...</p>
+          <p className="text-slate-600 dark:text-slate-400">Setting up your session...</p>
         </div>
       </div>
     );
@@ -87,11 +88,13 @@ function AppRoutes() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </SessionProvider>
+      <ThemeProvider>
+        <SessionProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </SessionProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

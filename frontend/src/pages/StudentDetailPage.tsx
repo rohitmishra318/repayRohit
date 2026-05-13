@@ -35,7 +35,7 @@ export function StudentDetailPage() {
   const studentAlerts = (alertsList || []).filter((a: any) => a.student_id === id);
 
   return (
-    <div className="flex-1 overflow-y-auto scrollbar-thin bg-[#FAFAFA]">
+    <div className="flex-1 overflow-y-auto scrollbar-thin bg-[#FAFAFA] dark:bg-slate-950">
       <PageHeader
         title={student.name}
         subtitle={`${student.course_type} · ${student.target_field} · ${student.months_since_graduation}mo post-grad`}
@@ -43,7 +43,7 @@ export function StudentDetailPage() {
           <div className="flex items-center gap-4">
             <RiskBadge tier={tier} score={risk.risk_score} size="md" />
             <button onClick={() => navigate(-1)}
-              className="text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 hover:text-slate-900 border border-slate-200/80 px-4 py-2 rounded-md shadow-sm transition-all">
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200/80 dark:border-slate-600 px-4 py-2 rounded-md shadow-sm transition-all">
               ← Back to List
             </button>
           </div>
@@ -62,11 +62,11 @@ export function StudentDetailPage() {
             <Card className="h-full flex flex-col border border-slate-200/60 shadow-sm bg-white" padding="lg">
               
               {/* Header without image */}
-              <div className="mb-6 pb-5 border-b border-slate-100">
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight mb-1">
+              <div className="mb-6 pb-5 border-b border-slate-100 dark:border-slate-700">
+                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight leading-tight mb-1">
                   {student.name}
                 </h2>
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">
+                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">
                   {student.course_type}
                 </p>
                 
@@ -83,7 +83,7 @@ export function StudentDetailPage() {
 
               {/* Data Rows */}
               <div className="flex-1 flex flex-col">
-                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mb-4">Core Metrics</h3>
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-4">Core Metrics</h3>
                 
                 <div className="space-y-3.5 flex-1">
                   {[
@@ -96,8 +96,8 @@ export function StudentDetailPage() {
                     { label: 'Target City', value: `Tier ${student.target_city_tier}` },
                   ].map(item => (
                     <div key={item.label} className="flex justify-between items-center group">
-                      <span className="text-[13px] text-slate-500">{item.label}</span>
-                      <span className={`text-[13px] font-medium ${item.highlight ? 'text-slate-900 font-bold' : 'text-slate-700'}`}>
+                      <span className="text-[13px] text-slate-500 dark:text-slate-400">{item.label}</span>
+                      <span className={`text-[13px] font-medium ${item.highlight ? 'text-slate-900 dark:text-slate-100 font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
                         {item.value ?? '—'}
                       </span>
                     </div>
@@ -105,9 +105,9 @@ export function StudentDetailPage() {
                 </div>
 
                 {/* Footer stat */}
-                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center bg-slate-50 p-3 rounded-md">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Data Trust Level</span>
-                  <span className="text-sm font-bold text-slate-800">
+                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-md">
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Data Trust Level</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
                     {((student.data_trust_score || 0.5) * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -119,23 +119,23 @@ export function StudentDetailPage() {
               COLUMN 2: RISK ANALYTICS
           ============================================================== */}
           <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full">
-            <Card padding="lg" className="flex-1 flex flex-col justify-center border border-slate-200/60 shadow-sm relative overflow-hidden">
+            <Card padding="lg" className="flex-1 flex flex-col justify-center border border-slate-200/60 dark:border-slate-700 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-              <h2 className="text-sm font-semibold text-slate-800 mb-5">Current Risk Score</h2>
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-5">Current Risk Score</h2>
               <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
               
               {risk.needs_human_review && (
-                <div className="mt-5 bg-amber-50/80 border border-amber-200/80 rounded p-3 text-xs text-amber-800 flex items-start gap-2">
+                <div className="mt-5 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-700 rounded p-3 text-xs text-amber-800 dark:text-amber-400 flex items-start gap-2">
                   <span className="text-base leading-none">⚠</span>
                   <span className="font-medium leading-relaxed">Wide uncertainty limits detected. Manual counselor review is recommended.</span>
                 </div>
               )}
             </Card>
 
-            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-800 mb-1">Placement Timeline</h2>
-              <p className="text-xs text-slate-500 mb-5">Probability over time</p>
-              <div className="flex-1 flex items-center justify-center bg-slate-50/50 rounded-lg p-3 border border-slate-100">
+            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 dark:border-slate-700 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Placement Timeline</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">Probability over time</p>
+              <div className="flex-1 flex items-center justify-center bg-slate-50/50 dark:bg-slate-700/30 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
                 <PlacementTimeline p_3mo={risk.p_3mo} p_6mo={risk.p_6mo} p_12mo={risk.p_12mo} />
               </div>
             </Card>
@@ -145,18 +145,18 @@ export function StudentDetailPage() {
               COLUMN 3: AI & CAUSAL DRIVERS
           ============================================================== */}
           <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full">
-            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-800 mb-1">Risk Drivers (SHAP)</h2>
-              <p className="text-xs text-slate-500 mb-5">Key causal variables</p>
-              <div className="flex-1 bg-slate-50/50 rounded-lg p-3 border border-slate-100">
+            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 dark:border-slate-700 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Risk Drivers (SHAP)</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">Key causal variables</p>
+              <div className="flex-1 bg-slate-50/50 dark:bg-slate-700/30 rounded-lg p-3 border border-slate-100 dark:border-slate-600">
                 <ShapDrivers drivers={risk.shap_drivers} />
               </div>
             </Card>
 
-            <Card className="border border-slate-200/60 border-t-4 border-t-blue-500 flex-1 flex flex-col shadow-sm" padding="lg">
+            <Card className="border border-slate-200/60 dark:border-slate-700 border-t-4 border-t-blue-500 flex-1 flex flex-col shadow-sm" padding="lg">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-slate-800">AI Narrative</h2>
-                <span className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wider border border-blue-100">
+                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">AI Narrative</h2>
+                <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold rounded uppercase tracking-wider border border-blue-100 dark:border-blue-700">
                   Conformal
                 </span>
               </div>
@@ -199,19 +199,19 @@ export function StudentDetailPage() {
               COLUMN 4: ACTIONS & ALERTS
           ============================================================== */}
           <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full">
-            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 shadow-sm">
-              <h2 className="text-sm font-semibold text-slate-800 mb-1">Recommended Interventions</h2>
-              <p className="text-xs text-slate-500 mb-4">Ranked by placement impact</p>
+            <Card padding="lg" className="flex-1 flex flex-col border border-slate-200/60 dark:border-slate-700 shadow-sm">
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">Recommended Interventions</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Ranked by placement impact</p>
               <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin">
                  <InterventionCards interventions={interventions?.interventions || []} />
               </div>
             </Card>
 
             {studentAlerts.length > 0 && (
-              <Card padding="lg" className="shrink-0 border border-slate-200/60 shadow-sm bg-white">
+              <Card padding="lg" className="shrink-0 border border-slate-200/60 dark:border-slate-700 shadow-sm bg-white dark:bg-slate-800">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-sm font-semibold text-slate-800">Active Alerts</h2>
-                  <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Active Alerts</h2>
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
                     {studentAlerts.length}
                   </span>
                 </div>

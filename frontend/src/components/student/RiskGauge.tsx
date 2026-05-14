@@ -1,67 +1,122 @@
+import React, { useEffect, useState } from 'react';
+
 interface Props {
   score: number;
   label: string;
 }
 
 export function RiskGauge({ score, label }: Props) {
+  const [animatedScore, setAnimatedScore] = useState(0);
+
+  // Trigger animation on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimatedScore(score), 100);
+    return () => clearTimeout(timer);
+  }, [score]);
+
   const pct = score * 100;
-  // SVG arc gauge
-  const R = 70;
-  const cx = 90, cy = 90;
-  const startAngle = -200;
-  const endAngle = 20;
-  const totalDeg = endAngle - startAngle;
-  const fillDeg = (score * totalDeg);
 
+  // SVG Parameters
+  const size = 160;
+  const center = size / 2;
+  const strokeWidth = 10;
+  const radius = (size - strokeWidth) / 2 - 8; // Inner radius
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (animatedScore * circumference);
 
-  function polarToCartesian(cx: number, cy: number, r: number, deg: number) {
-    const rad = ((deg - 90) * Math.PI) / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  }
+  const isHigh = score >= 0.75;
+  const isMedium = score >= 0.55 && score < 0.75;
 
-  function arcPath(cx: number, cy: number, r: number, start: number, end: number) {
-    const s = polarToCartesian(cx, cy, r, start);
-    const e = polarToCartesian(cx, cy, r, end);
-    const large = end - start > 180 ? 1 : 0;
-    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
-  }
+  // Theme-adaptive classes
+  const colorClass = isHigh
+    ? 'text-red-500 dark:text-red-400'
+    : isMedium
+      ? 'text-amber-500 dark:text-amber-400'
+      : 'text-emerald-500 dark:text-emerald-400';
 
-  const color = score >= 0.75 ? '#DC2626' : score >= 0.55 ? '#D97706' : '#16A34A';
-  const tier = score >= 0.75 ? 'HIGH RISK' : score >= 0.55 ? 'MEDIUM RISK' : 'LOW RISK';
+  const glowColor = isHigh
+    ? 'rgba(239,68,68,0.5)'
+    : isMedium
+      ? 'rgba(245,158,11,0.5)'
+      : 'rgba(16,185,129,0.5)';
+
+  const tier = isHigh ? 'HIGH RISK' : isMedium ? 'MEDIUM RISK' : 'LOW RISK';
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative">
-        <svg width="180" height="130" viewBox="0 0 180 130">
-          {/* Track */}
-          <path d={arcPath(cx, cy, R, startAngle, endAngle)}
-            fill="none" stroke="#E2E8F0" strokeWidth="10" strokeLinecap="round" />
-          {/* Fill */}
-          <path d={arcPath(cx, cy, R, startAngle, startAngle + fillDeg)}
-            fill="none" stroke={color} strokeWidth="10" strokeLinecap="round" />
-          {/* Tick marks */}
-          {[0, 25, 50, 75, 100].map(t => {
-            const deg = startAngle + (t / 100) * totalDeg;
-            const inner = polarToCartesian(cx, cy, R - 14, deg);
-            const outer = polarToCartesian(cx, cy, R - 6, deg);
-            return <line key={t} x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y} stroke="#CBD5E1" strokeWidth="1.5" />;
-          })}
-          {/* Center value */}
-          <text x={cx} y={cy + 8} textAnchor="middle" fontSize="22" fontWeight="700"
-            fill={color} fontFamily="DM Sans, sans-serif">
-            {pct.toFixed(0)}%
-          </text>
-          <text x={cx} y={cy + 26} textAnchor="middle" fontSize="9" fill="#94A3B8"
-            fontFamily="DM Sans, sans-serif" letterSpacing="0.5">
-            PLACEMENT RISK
-          </text>
+    <div className="flex flex-col items-center sector-reveal">
+
+      {/* ── Visual Gauge Container ── */}
+      <div className="relative flex items-center justify-center w-[160px] h-[160px]">
+
+        {/* Background Glow (Dark Mode Only) */}
+        <div
+          className="absolute inset-0 rounded-full blur-xl opacity-0 dark:opacity-20 transition-opacity duration-1000"
+          style={{ backgroundColor: glowColor, transform: 'scale(0.8)' }}
+        />
+
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90 relative z-10 overflow-visible">
+
+          {/* Outer Decorative Dashed Ring (Radar effect) */}
+          <circle
+            cx={center}
+            cy={center}
+            r={radius + 12}
+            fill="none"
+            className="stroke-slate-300 dark:stroke-white/10"
+            strokeWidth="1.5"
+            strokeDasharray="2 6"
+          />
+
+          {/* Inner Background Track */}
+          <circle
+            cx={center}
+            cy={center}
+            r={radius}
+            fill="none"
+            className="stroke-slate-100 dark:stroke-white/5"
+            strokeWidth={strokeWidth}
+          />
+
+          {/* Animated Foreground Ring */}
+          <circle
+            cx={center}
+            cy={center}
+            r={radius}
+            fill="none"
+            className={`stroke-current ${colorClass} transition-all duration-1000 ease-out`}
+            strokeWidth={strokeWidth}
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            style={{
+              filter: `drop-shadow(0 0 6px ${glowColor})`
+            }}
+          />
         </svg>
+
+        {/* ── Centered HTML Typography ── */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+          <span className={`text-3xl font-bold font-mono tracking-tight ${colorClass} transition-colors duration-500`}>
+            {pct.toFixed(0)}<span className="text-xl opacity-70">%</span>
+          </span>
+          <span className="text-[9px] font-bold font-display text-slate-400 dark:text-white/40 tracking-[0.2em] mt-0.5">
+            RISK
+          </span>
+        </div>
+
       </div>
-      <div className="mt-1 text-center">
-        <span className={`text-xs font-semibold tracking-widest uppercase ${
-          score >= 0.75 ? 'text-red-600' : score >= 0.55 ? 'text-amber-600' : 'text-emerald-600'
-        }`}>{tier}</span>
-        <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+
+      {/* ── Footer Information ── */}
+      <div className="mt-4 text-center flex flex-col gap-1.5 items-center">
+        <span className={`inline-flex items-center justify-center px-3 py-1 rounded-md text-[10px] font-bold font-display tracking-widest uppercase border ${isHigh ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/30' :
+            isMedium ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/30' :
+              'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30'
+          }`}>
+          {tier}
+        </span>
+        <p className="text-[11px] font-medium font-body text-slate-500 dark:text-white/50 max-w-[140px] leading-tight">
+          {label}
+        </p>
       </div>
     </div>
   );

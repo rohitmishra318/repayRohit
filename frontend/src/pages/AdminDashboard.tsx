@@ -1,3 +1,4 @@
+import { useState } from 'react'; // Added useState
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio, useStudents } from '../hooks';
 import { PageHeader } from '../components/layout/PageHeader';
@@ -13,8 +14,16 @@ export function AdminDashboard() {
   const { data: portfolio, isLoading: pLoading } = usePortfolio();
   const { data: students, isLoading: sLoading } = useStudents();
 
+  // State to manage how many students are visible
+  const [visibleCount, setVisibleCount] = useState(50);
+
   if (pLoading || sLoading) return <Spinner label="Loading portfolio..." size="lg" />;
   if (!portfolio) return <p className="p-6 text-slate-400 dark:text-slate-500">Failed to load portfolio data.</p>;
+
+  // Function to show 50 more students
+  const handleShowMore = () => {
+    setVisibleCount(prev => prev + 50);
+  };
 
   return (
     <div className="flex-1 overflow-y-auto scrollbar-thin bg-slate-50 dark:bg-slate-950">
@@ -30,7 +39,6 @@ export function AdminDashboard() {
       />
 
       <div className="p-6 space-y-5 max-w-screen-xl mx-auto">
-
         {/* KPI */}
         <KPIRibbon data={portfolio} />
 
@@ -46,12 +54,13 @@ export function AdminDashboard() {
 
         {/* STUDENTS */}
         <div className="grid grid-cols-1 gap-5">
-
           {/* Student table */}
           <Card className="flex flex-col h-full min-h-[400px]" padding="none">
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Borrower List</h2>
-              <span className="text-xs text-slate-400 dark:text-slate-500">{students?.length} borrowers</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500">
+                Showing {Math.min(visibleCount, students?.length || 0)} of {students?.length} borrowers
+              </span>
             </div>
 
             <div className="flex-1 overflow-auto min-h-0">
@@ -67,7 +76,8 @@ export function AdminDashboard() {
                 </thead>
 
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
-                  {students?.map(s => (
+                  {/* Applied .slice() to limit visible items */}
+                  {students?.slice(0, visibleCount).map(s => (
                     <tr
                       key={s.student_id}
                       onClick={() => navigate(`/student/${s.student_id}`)}
@@ -98,9 +108,20 @@ export function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Show More Button - Only appears if there are more students to show */}
+              {students && visibleCount < students.length && (
+                <div className="p-4 flex justify-center border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800/50">
+                  <button
+                    onClick={handleShowMore}
+                    className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                  >
+                    Show 50 more borrowers ↓
+                  </button>
+                </div>
+              )}
             </div>
           </Card>
-
         </div>
       </div>
     </div>

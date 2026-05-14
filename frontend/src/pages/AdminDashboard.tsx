@@ -162,29 +162,40 @@ export function AdminDashboard() {
           {/* ── Geographic Map ── */}
           <div className="dash-section" style={{ animationDelay: '80ms' }}>
             <div className="glass-card rounded-2xl overflow-hidden">
-              {/* Card header */}
               <div className="flex items-center justify-between px-6 py-4
-                              border-b border-slate-100 dark:border-white/5">
+                    border-b border-slate-100 dark:border-white/5">
                 <div>
                   <p className={SECTION_TITLE}>Geographic Risk Spread</p>
-                  <p className={SECTION_SUB}>Student distribution across India by risk level</p>
+                  <p className={SECTION_SUB}>
+                    Borrower distribution across India · hover any marker for details
+                  </p>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-body">
-                  {[
-                    { color: 'bg-red-500', label: 'High' },
-                    { color: 'bg-amber-400', label: 'Medium' },
-                    { color: 'bg-emerald-500', label: 'Low' },
-                  ].map(l => (
-                    <span key={l.label} className="flex items-center gap-1.5 text-slate-500 dark:text-white/30">
-                      <span className={`w-2 h-2 rounded-full ${l.color}`} />
-                      {l.label}
-                    </span>
-                  ))}
+                <div className="flex items-center gap-1.5 text-xs font-body font-semibold
+                      text-violet-600 dark:text-violet-400
+                      bg-violet-50 dark:bg-violet-500/10
+                      border border-violet-200 dark:border-violet-500/20
+                      px-3 py-1.5 rounded-full">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {Object.keys(students?.reduce((acc, s) => {
+                    // count unique inferred states — reuse same hash
+                    let hash = 0;
+                    const str = s.student_id || '';
+                    for (let i = 0; i < str.length; i++) {
+                      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                      hash = hash & hash;
+                    }
+                    const stateKeys = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Puducherry', 'Jammu & Kashmir'];
+                    acc[stateKeys[Math.abs(hash) % stateKeys.length]] = true;
+                    return acc;
+                  }, {} as Record<string, boolean>) || {}).length} states
                 </div>
               </div>
-
-              {/* Map area */}
-              <div className="p-4 min-h-[400px] bg-slate-50/60 dark:bg-white/[0.015] rounded-b-2xl">
+              <div className="p-4 min-h-[420px]">
                 <IndiaMapImage students={students || []} />
               </div>
             </div>
@@ -338,8 +349,8 @@ export function AdminDashboard() {
                           {/* Status */}
                           <td className="px-8 py-4">
                             <span className={`inline-flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-full font-bold font-body uppercase tracking-wider border ${s.placement_status === 'placed'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30'
-                                : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/30'
+                              ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/30'
+                              : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/30'
                               }`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${s.placement_status === 'placed' ? 'bg-emerald-500' : 'bg-amber-400 animate-pulse'}`} />
                               {s.placement_status}

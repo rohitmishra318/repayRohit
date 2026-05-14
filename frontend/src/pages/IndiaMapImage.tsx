@@ -1,247 +1,196 @@
-import { useState, useMemo } from "react";
-import type { StudentListItem } from "../types";
+import React, { useState, useMemo, useRef } from 'react';
+import Map, { Marker, Popup, NavigationControl } from 'react-map-gl/mapbox';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import type { StudentListItem } from '../types';
 
-/**
- * Standard Geographical Bounds for a typical map of India.
- * Adjust these values if your image (/india.jpg) includes 
- * more of the ocean or neighboring countries.
- */
-const INDIA_BOUNDS = {
-  minLat: 6.5,   // South (including islands)
-  maxLat: 38.5,  // North
-  minLng: 68.0,  // West
-  maxLng: 98.0,  // East
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+
+const STATE_COORDS: Record<string, { lat: number; lng: number; abbr: string }> = {
+  'Andhra Pradesh': { lat: 15.91, lng: 79.74, abbr: 'AP' },
+  'Arunachal Pradesh': { lat: 28.21, lng: 94.72, abbr: 'AR' },
+  'Assam': { lat: 26.20, lng: 92.93, abbr: 'AS' },
+  'Bihar': { lat: 25.09, lng: 85.31, abbr: 'BR' },
+  'Chhattisgarh': { lat: 21.27, lng: 81.86, abbr: 'CG' },
+  'Goa': { lat: 15.29, lng: 73.85, abbr: 'GA' },
+  'Gujarat': { lat: 22.25, lng: 71.19, abbr: 'GJ' },
+  'Haryana': { lat: 29.05, lng: 76.08, abbr: 'HR' },
+  'Himachal Pradesh': { lat: 31.10, lng: 77.17, abbr: 'HP' },
+  'Jharkhand': { lat: 23.61, lng: 85.27, abbr: 'JH' },
+  'Karnataka': { lat: 15.31, lng: 75.71, abbr: 'KA' },
+  'Kerala': { lat: 10.85, lng: 76.27, abbr: 'KL' },
+  'Madhya Pradesh': { lat: 23.47, lng: 77.94, abbr: 'MP' },
+  'Maharashtra': { lat: 19.75, lng: 75.71, abbr: 'MH' },
+  'Manipur': { lat: 24.66, lng: 93.90, abbr: 'MN' },
+  'Meghalaya': { lat: 25.46, lng: 91.36, abbr: 'ML' },
+  'Mizoram': { lat: 23.16, lng: 92.93, abbr: 'MZ' },
+  'Nagaland': { lat: 26.15, lng: 94.56, abbr: 'NL' },
+  'Odisha': { lat: 20.95, lng: 85.09, abbr: 'OD' },
+  'Punjab': { lat: 31.14, lng: 75.34, abbr: 'PB' },
+  'Rajasthan': { lat: 27.39, lng: 73.43, abbr: 'RJ' },
+  'Sikkim': { lat: 27.53, lng: 88.51, abbr: 'SK' },
+  'Tamil Nadu': { lat: 11.12, lng: 78.65, abbr: 'TN' },
+  'Telangana': { lat: 18.11, lng: 79.01, abbr: 'TG' },
+  'Tripura': { lat: 23.94, lng: 91.98, abbr: 'TR' },
+  'Uttar Pradesh': { lat: 26.84, lng: 80.94, abbr: 'UP' },
+  'Uttarakhand': { lat: 30.06, lng: 79.01, abbr: 'UK' },
+  'West Bengal': { lat: 22.98, lng: 87.85, abbr: 'WB' },
+  'Delhi': { lat: 28.61, lng: 77.20, abbr: 'DL' },
+  'Puducherry': { lat: 11.94, lng: 79.80, abbr: 'PY' },
+  'Jammu & Kashmir': { lat: 33.77, lng: 76.57, abbr: 'JK' },
 };
 
-/**
- * Indian States with Capital Coordinates (Lat/Long).
- * Using real values allows your map to scale accurately.
- * These are approximate locations of state capitals or major cities.
- */
-const STATE_COORDS: Record<string, { lat: number; lng: number; state: string }> = {
-  "Andhra Pradesh":      { lat: 13.1939, lng: 79.8711, state: "AP" },
-  "Arunachal Pradesh":   { lat: 28.2180, lng: 92.9389, state: "AR" },
-  "Assam":               { lat: 26.1445, lng: 91.7362, state: "AS" },
-  "Bihar":               { lat: 25.5941, lng: 85.1376, state: "BR" },
-  "Chhattisgarh":        { lat: 21.2787, lng: 81.8661, state: "CG" },
-  "Goa":                 { lat: 15.2993, lng: 73.8243, state: "GA" },
-  "Gujarat":             { lat: 23.0225, lng: 72.5714, state: "GJ" },
-  "Haryana":             { lat: 29.0588, lng: 77.0745, state: "HR" },
-  "Himachal Pradesh":    { lat: 31.7433, lng: 77.1205, state: "HP" },
-  "Jharkhand":           { lat: 23.3441, lng: 85.3096, state: "JH" },
-  "Karnataka":           { lat: 12.9716, lng: 77.5946, state: "KA" },
-  "Kerala":              { lat: 8.7781, lng: 76.8754, state: "KL" },
-  "Madhya Pradesh":      { lat: 23.1815, lng: 79.9864, state: "MP" },
-  "Maharashtra":         { lat: 19.7515, lng: 75.7139, state: "MH" },
-  "Manipur":             { lat: 24.6637, lng: 93.9063, state: "MN" },
-  "Meghalaya":           { lat: 25.5788, lng: 91.8933, state: "ML" },
-  "Mizoram":             { lat: 23.1645, lng: 92.9376, state: "MZ" },
-  "Nagaland":            { lat: 25.6751, lng: 93.7597, state: "NL" },
-  "Odisha":              { lat: 20.2961, lng: 85.8245, state: "OD" },
-  "Punjab":              { lat: 31.5204, lng: 74.3587, state: "PB" },
-  "Rajasthan":           { lat: 26.9246, lng: 75.8245, state: "RJ" },
-  "Sikkim":              { lat: 27.5330, lng: 88.5122, state: "SK" },
-  "Tamil Nadu":          { lat: 13.0827, lng: 80.2707, state: "TN" },
-  "Telangana":           { lat: 17.3850, lng: 78.4867, state: "TG" },
-  "Tripura":             { lat: 23.8103, lng: 91.2868, state: "TR" },
-  "Uttar Pradesh":       { lat: 26.8467, lng: 80.9462, state: "UP" },
-  "Uttarakhand":         { lat: 30.0668, lng: 79.0193, state: "UK" },
-  "West Bengal":         { lat: 22.5726, lng: 88.3639, state: "WB" },
-  "Delhi":               { lat: 28.6139, lng: 77.2090, state: "DL" },
-  "Puducherry":          { lat: 11.9416, lng: 79.5535, state: "PY" },
-  "Ladakh":              { lat: 34.3526, lng: 77.5770, state: "LD" },
-  "Jammu & Kashmir":     { lat: 34.0837, lng: 74.7973, state: "JK" },
-};
-
-function project(lat: number, lng: number) {
-  // Linear projection (Equirectangular) logic
-  const x = ((lng - INDIA_BOUNDS.minLng) / (INDIA_BOUNDS.maxLng - INDIA_BOUNDS.minLng)) * 100;
-  const y = ((INDIA_BOUNDS.maxLat - lat) / (INDIA_BOUNDS.maxLat - INDIA_BOUNDS.minLat)) * 100;
-
-  return { x, y };
-}
-
-/**
- * Infer state from student location or target field.
- * This is a simplified mapping - in production, add a state field to the Student model.
- * Uses student_id hash for deterministic but pseudo-random distribution.
- */
-function inferStateFromStudent(student: StudentListItem): string {
+function inferState(student: StudentListItem): string {
   const states = Object.keys(STATE_COORDS);
-  
-  // Create a deterministic hash from student_id
   let hash = 0;
-  const str = student.student_id || "";
+  const str = student.student_id || '';
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = hash & hash;
   }
-  
-  // Use hash to select state deterministically
-  const index = Math.abs(hash) % states.length;
-  return states[index];
+  return states[Math.abs(hash) % states.length];
 }
 
-/**
- * Get color based on risk score
- */
-function getRiskColor(avgRisk: number): { bg: string; border: string; glow: string } {
-  if (avgRisk >= 0.75) {
-    // HIGH RISK - Red
-    return { bg: "bg-red-600", border: "border-red-700", glow: "shadow-red-500/50" };
-  } else if (avgRisk >= 0.55) {
-    // MEDIUM RISK - Orange
-    return { bg: "bg-orange-500", border: "border-orange-600", glow: "shadow-orange-500/50" };
-  } else {
-    // LOW RISK - Green
-    return { bg: "bg-green-500", border: "border-green-600", glow: "shadow-green-500/50" };
-  }
-}
+export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
+  const mapRef = useRef<any>(null);
+  const [hoveredState, setHoveredState] = useState<string | null>(null);
 
-/**
- * Get risk label
- */
-function getRiskLabel(avgRisk: number): string {
-  if (avgRisk >= 0.75) return "HIGH";
-  if (avgRisk >= 0.55) return "MEDIUM";
-  return "LOW";
-}
-
-interface Props {
-  students: StudentListItem[];
-}
-
-export function IndiaMapImage({ students }: Props) {
-  const [hover, setHover] = useState<string | null>(null);
-
-  // Group students by state and calculate statistics
   const stateStats = useMemo(() => {
     const groups: Record<string, StudentListItem[]> = {};
-
-    // Group students by inferred state
-    students.forEach(student => {
-      const state = inferStateFromStudent(student);
-      if (!groups[state]) {
-        groups[state] = [];
-      }
-      groups[state].push(student);
+    students.forEach(s => {
+      const st = inferState(s);
+      if (!groups[st]) groups[st] = [];
+      groups[st].push(s);
     });
 
-    // Calculate statistics per state
-    const stats: Record<string, {
-      count: number;
-      avgRisk: number;
-      highRiskCount: number;
-      mediumRiskCount: number;
-      lowRiskCount: number;
-    }> = {};
-
-    Object.entries(groups).forEach(([state, stateStudents]) => {
-      const riskScores = stateStudents.map(s => s.risk_score || 0);
-      const avgRisk = riskScores.reduce((a, b) => a + b, 0) / riskScores.length;
-
-      stats[state] = {
-        count: stateStudents.length,
-        avgRisk,
-        highRiskCount: riskScores.filter(r => r >= 0.75).length,
-        mediumRiskCount: riskScores.filter(r => r >= 0.55 && r < 0.75).length,
-        lowRiskCount: riskScores.filter(r => r < 0.55).length,
+    const out: Record<string, any> = {};
+    Object.entries(groups).forEach(([st, list]) => {
+      const scores = list.map(s => s.risk_score || 0);
+      out[st] = {
+        count: list.length,
+        avgRisk: scores.reduce((a, b) => a + b, 0) / scores.length,
       };
     });
-
-    return stats;
+    return out;
   }, [students]);
 
+  const maxCount = Math.max(...Object.values(stateStats).map((s: any) => s.count), 1);
+
   return (
-    <div className="relative w-full max-w-2xl mx-auto bg-slate-50 rounded-xl p-2 border border-slate-200 shadow-sm overflow-hidden">
-      <div className="relative w-full h-full">
-        {/* Map Image - Ensure the image is a standard projection */}
-        <img
-          src="/india.jpg"
-          alt="India Student Distribution by State"
-          className="w-full h-auto rounded-lg block"
-        />
+    <div className="relative w-full h-[550px] rounded-2xl overflow-hidden border border-white/5 bg-[#0d0d1f]">
+      {/* Global CSS for the ripple animation */}
+      <style>{`
+        @keyframes ripple {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(3); opacity: 0; }
+        }
+        .ripple {
+          position: absolute;
+          border-radius: 50%;
+          animation: ripple 2s ease-out infinite;
+        }
+        .mapboxgl-popup-content {
+          background: rgba(18, 18, 31, 0.9) !important;
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px !important;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+          color: white !important;
+          padding: 12px !important;
+        }
+        .mapboxgl-popup-tip {
+          border-top-color: rgba(18, 18, 31, 0.9) !important;
+        }
+      `}</style>
 
-        {/* Coordinate Overlay Layer */}
-        <div className="absolute inset-0 pointer-events-none">
-          {Object.entries(STATE_COORDS).map(([stateName, coord]) => {
-            const { x, y } = project(coord.lat, coord.lng);
+      <Map
+        ref={mapRef}
+        initialViewState={{ longitude: 78.9629, latitude: 22.5937, zoom: 4.2 }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle="mapbox://styles/mapbox/dark-v11"
+        mapboxAccessToken={MAPBOX_TOKEN}
+        attributionControl={false}
+      >
+        <NavigationControl position="top-right" />
 
-            // Safety check: Don't render if coordinates fall outside the map area
-            if (x < 0 || x > 100 || y < 0 || y > 100) return null;
+        {Object.entries(STATE_COORDS).map(([name, coord]) => {
+          const stats = stateStats[name];
+          if (!stats || stats.count === 0) return null;
 
-            const stats = stateStats[stateName];
-            if (!stats || stats.count === 0) return null; // Only show states with students
+          const isHigh = stats.avgRisk >= 0.75;
+          const isMid = stats.avgRisk >= 0.55;
 
-            const colors = getRiskColor(stats.avgRisk);
-            const riskLabel = getRiskLabel(stats.avgRisk);
+          // Using the teal/green theme from the image
+          const coreColor = isHigh ? '#ef4444' : isMid ? '#f59e0b' : '#34d399';
+          const size = 8 + (stats.count / maxCount) * 16;
 
-            return (
-              <div
-                key={stateName}
-                className="absolute pointer-events-auto group"
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  transform: "translate(-50%, -50%)",
-                  zIndex: hover === stateName ? 50 : 10,
-                }}
-                onMouseEnter={() => setHover(stateName)}
-                onMouseLeave={() => setHover(null)}
-              >
-                {/* Visual Indicator (Dot + Pulse) */}
-                <div className="relative">
-                  {/* Pulse Effect for visibility */}
-                  <div className={`absolute inset-0 w-3 h-3 ${colors.bg} rounded-full animate-pulse opacity-40`} />
-                  
-                  {/* Core Dot - Color based on risk */}
-                  <div className={`w-3 h-3 rounded-full border-2 border-white shadow-lg transition-all duration-200 ${colors.bg} ${
-                    hover === stateName ? "scale-150 shadow-2xl" : ""
-                  } ${colors.glow}`} />
+          return (
+            <React.Fragment key={name}>
+              <Marker longitude={coord.lng} latitude={coord.lat} anchor="center">
+                <div
+                  className="relative cursor-pointer group"
+                  onMouseEnter={() => setHoveredState(name)}
+                  onMouseLeave={() => setHoveredState(null)}
+                >
+                  {/* Ripple Effect */}
+                  <div
+                    className="ripple"
+                    style={{
+                      width: size, height: size,
+                      backgroundColor: coreColor,
+                      left: 0, top: 0
+                    }}
+                  />
+
+                  {/* Core Dot */}
+                  <div
+                    className="relative transition-all duration-300 group-hover:scale-125 shadow-lg"
+                    style={{
+                      width: size,
+                      height: size,
+                      backgroundColor: coreColor,
+                      borderRadius: '50%',
+                      border: '1.5px solid rgba(255,255,255,0.4)',
+                      boxShadow: `0 0 20px ${coreColor}`,
+                    }}
+                  />
                 </div>
+              </Marker>
 
-                {/* Tooltip Overlay */}
-                {hover === stateName && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-slate-900 text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-xl whitespace-nowrap z-50 min-w-max">
-                    <div className="font-bold text-sm">{stateName}</div>
-                    <div className="text-slate-300 text-xs mt-1">
-                      <div>Students: <span className="text-white font-mono">{stats.count}</span></div>
-                      <div>Avg Risk: <span className={`font-mono font-bold ${
-                        stats.avgRisk >= 0.75 ? "text-red-300" : stats.avgRisk >= 0.55 ? "text-orange-300" : "text-green-300"
-                      }`}>{(stats.avgRisk * 100).toFixed(1)}%</span></div>
-                      <div className="mt-1 pt-1 border-t border-slate-700 text-xs">
-                        <div>🔴 High: {stats.highRiskCount}</div>
-                        <div>🟠 Medium: {stats.mediumRiskCount}</div>
-                        <div>🟢 Low: {stats.lowRiskCount}</div>
-                      </div>
+              {hoveredState === name && (
+                <Popup
+                  longitude={coord.lng}
+                  latitude={coord.lat}
+                  anchor="bottom"
+                  closeButton={false}
+                  offsetTop={-size}
+                >
+                  <div className="font-display">
+                    <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">State Details</p>
+                    <h3 className="font-bold text-sm text-white mb-2">{name}</h3>
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-xs text-slate-300">Borrowers</span>
+                      <span className="text-xs font-bold">{stats.count}</span>
                     </div>
-                    {/* Tooltip Arrow */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
+                    <div className="flex items-center justify-between gap-4 mt-1">
+                      <span className="text-xs text-slate-300">Risk Level</span>
+                      <span className="text-xs font-bold" style={{ color: coreColor }}>
+                        {(stats.avgRisk * 100).toFixed(1)}%
+                      </span>
+                    </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                </Popup>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </Map>
 
-        {/* Legend */}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg p-3 border border-slate-200 shadow-md text-xs font-medium">
-          <div className="font-semibold text-slate-900 mb-2">Risk Level</div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full border border-green-600" />
-              <span>Low Risk (&lt;55%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-orange-500 rounded-full border border-orange-600" />
-              <span>Medium Risk (55-75%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-600 rounded-full border border-red-700" />
-              <span>High Risk (≥75%)</span>
-            </div>
-          </div>
+      {/* Floating Header Label */}
+      <div className="absolute top-4 left-4 z-10">
+        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-lg">
+          <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-medium">
+            Live Risk Spread
+          </p>
         </div>
       </div>
     </div>

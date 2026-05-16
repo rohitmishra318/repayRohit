@@ -114,11 +114,11 @@ interface Intervention {
   id: string;
   name: string;
   category: string;
-  predicted_lift: number;
-  cost: string;
-  effort: string;
+  base_lift_pp: number;
+  adjusted_lift_pp: number;
+  cost_tier: string;
+  delivery: string;
   description: string;
-  time_to_impact?: string;
 }
 
 export interface Alert {

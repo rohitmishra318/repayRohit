@@ -79,7 +79,16 @@ def rank_interventions(student_features, risk_data, top_n=3):
     Returns:
         List of top_n intervention dicts with adjusted_lift_pp
     """
-    course_family = student_features.get("course_family", "market")
+    raw_family = student_features.get("course_family", "market")
+    raw_family = raw_family.lower() if raw_family else "market"
+    
+    # Map academic fields to intervention families if needed
+    if raw_family in ["engineering", "mba", "ca", "campus"]:
+        course_family = "campus"
+    elif raw_family in ["nursing", "law", "architecture", "regulatory"]:
+        course_family = "regulatory"
+    else:
+        course_family = "market"
 
     candidates = []
     for intervention in INTERVENTION_CATALOG:

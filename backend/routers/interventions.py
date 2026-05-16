@@ -9,15 +9,20 @@ from backend.ml.intervention_ranker import rank_interventions
 from backend.services.risk_service import score_student
 from backend.models.schema import RiskScore
 
+import logging
+logger = logging.getLogger(__name__)    
+
 router = APIRouter()
 
 @router.get("/{student_id}")
 async def get_interventions(student_id: str, db: Session = Depends(get_db)):
+    print(f"\n\nFetching interventions for student {student_id} ")
     student = db.query(Student).filter(Student.student_id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
     institute = db.query(Institute).filter(Institute.institute_id == student.institute_id).first()
-
+    print(f"\n\nStudent: {student}")
+    print(f"\n\nInstitute: {institute}")    
     # Get latest demand
     demand_record = get_latest_demand(student.target_field, student.target_city_tier, db)
     
@@ -27,7 +32,8 @@ async def get_interventions(student_id: str, db: Session = Depends(get_db)):
     cohort_df = pd.DataFrame()
     
     features = build_feature_vector(student, institute, demand_record, cohort_df, db)
-    
+    print(f"\n\nFeatures: {features}")  
+
     risk_score = db.query(RiskScore).filter(RiskScore.student_id == student_id).first()
     if not risk_score:
         risk_data = await score_student(student_id, db)
@@ -38,7 +44,7 @@ async def get_interventions(student_id: str, db: Session = Depends(get_db)):
         }
 
     interventions = rank_interventions(features, risk_data, top_n=3)
-
+    print(f"\n\nInterventions for student {student_id}: {interventions}\n\n")   
     return {
         "student_id": student_id,
         "generated_at": datetime.utcnow().isoformat(),

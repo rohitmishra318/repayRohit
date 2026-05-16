@@ -50,7 +50,7 @@ export function StudentProfilePage() {
       cert_count: student.cert_count,
       ppo_exists: student.ppo_exists,
       tenth_board_score: student.tenth_board_score || undefined,
-      twelfth_board_score: student.twelfth_board_score || undefined,
+      twelth_board_score: student.twelth_board_score || undefined,
       target_field: student.target_field,
       target_city_tier: student.target_city_tier,
       months_since_graduation: student.months_since_graduation,

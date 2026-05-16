@@ -1,9 +1,9 @@
 
 
 // ============ Auth Types ============
- type UserRole = 'admin' | 'student';
+type UserRole = 'admin' | 'student';
 
- interface User {
+interface User {
   id: string;
   name: string;
   email: string;
@@ -11,20 +11,20 @@
   student_id?: string; // only for students
 }
 
- interface AuthState {
+interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
 
- interface LoginPayload {
+interface LoginPayload {
   email: string;
   password: string;
   role: UserRole;
 }
 
- interface RegisterPayload {
+interface RegisterPayload {
   name: string;
   email: string;
   password: string;
@@ -32,13 +32,13 @@
   student_id?: string; // students link their loan account
 }
 
- interface AuthResponse {
+interface AuthResponse {
   user: User;
   token: string;
 }
 
 // ============ Student Types ============
- interface StudentListItem {
+interface StudentListItem {
   student_id: string;
   name: string;
   course_type: string;
@@ -51,7 +51,7 @@
   institute_tier: string;
 }
 
- interface StudentDetail extends StudentListItem {
+interface StudentDetail extends StudentListItem {
   cgpa: number;
   internship_employer_tier: string;
   ppo_exists: boolean;
@@ -69,7 +69,7 @@ export interface StudentUpdatePayload {
   cert_count?: number;
   ppo_exists?: boolean;
   tenth_board_score?: number;
-  twelfth_board_score?: number;
+  twelth_board_score?: number;
   target_field?: string;
   target_city_tier?: number;
   months_since_graduation?: number;
@@ -82,12 +82,12 @@ export interface ShapDriver {
   display: string;
 }
 
- interface BiasFlag {
+interface BiasFlag {
   flag: string;
   severity: string;
 }
 
- interface RiskData {
+interface RiskData {
   student_id: string;
   risk_score: number;
   ci_lower: number;
@@ -110,7 +110,7 @@ export interface ShapDriver {
   scored_at: string;
 }
 
- interface Intervention {
+interface Intervention {
   id: string;
   name: string;
   category: string;
@@ -135,14 +135,14 @@ export interface Alert {
   action_taken: string | null;
 }
 
- interface SectorExposure {
+interface SectorExposure {
   field: string;
   student_count: number;
   avg_risk: number;
   demand_percentile: number;
 }
 
- interface PortfolioSummary {
+interface PortfolioSummary {
   total_students: number;
   high_risk_count: number;
   medium_risk_count: number;
@@ -153,4 +153,4 @@ export interface Alert {
   model_version?: any;
 }
 
-export  type { PortfolioSummary ,SectorExposure, Alert, Intervention, RiskData, BiasFlag, ShapDriver, StudentDetail, StudentListItem, StudentUpdatePayload, AuthResponse, RegisterPayload, LoginPayload, AuthState, User, UserRole } ;
+export type { PortfolioSummary, SectorExposure, Alert, Intervention, RiskData, BiasFlag, ShapDriver, StudentDetail, StudentListItem, StudentUpdatePayload, AuthResponse, RegisterPayload, LoginPayload, AuthState, User, UserRole };

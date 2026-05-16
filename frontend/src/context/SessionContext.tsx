@@ -19,7 +19,10 @@ export interface StudentSession {
   cert_count?: number;
   loan_emi_monthly?: number;
   tenth_board_score?: number;
-  twelfth_board_score?: number;
+  twelth_board_score?: number;
+  months_since_graduation?: number;
+
+
 }
 
 interface SessionContextValue {
@@ -30,6 +33,7 @@ interface SessionContextValue {
   setStudent: (s: StudentSession | null) => void;
   isLoading: boolean;
   isAuthenticated: boolean;
+  logout: () => Promise<void>;
   firebaseError: string | null;
 }
 
@@ -42,6 +46,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [firebaseError, setFirebaseError] = useState<string | null>(null);
 
+  const logout = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   useEffect(() => {
     // Check if Firebase is properly initialized
     if (!auth) {
@@ -52,10 +64,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
     // Subscribe to Firebase auth state changes
     const unsubscribe = onAuthStateChanged(
-      auth, 
+      auth,
       async (user) => {
         setFirebaseUser(user);
-        
+
         if (!user) {
           setStudent(null);
           setIsLoading(false);
@@ -85,10 +97,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
               'Content-Type': 'application/json',
             },
           });
-          
+
           console.log('Auth state change - user logged in:', user.email);
           console.log('GET /auth/me response:', { status: response.status, ok: response.ok });
-          
+
           if (response.ok) {
             const userData = await response.json();
             console.log('User data received:', userData);
@@ -107,6 +119,10 @@ export function SessionProvider({ children }: { children: ReactNode }) {
               loan_emi_monthly: userData.loan_emi_monthly,
               tenth_board_score: userData.tenth_board_score,
               twelfth_board_score: userData.twelfth_board_score,
+              months_since_graduation: userData.months_since_graduation,
+              institute_tier: userData.institute_tier,
+              target_field: userData.target_field,
+              target_city_tier: userData.target_city_tier,
             });
             // Determine role based on whether they're an admin
             setRole(userData.role === 'admin' ? 'admin' : 'student');
@@ -136,15 +152,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SessionContext.Provider 
-      value={{ 
-        firebaseUser, 
-        role, 
-        setRole, 
-        student, 
+    <SessionContext.Provider
+      value={{
+        firebaseUser,
+        role,
+        setRole,
+        student,
         setStudent,
         isLoading,
         isAuthenticated: !!firebaseUser,
+        logout,
         firebaseError,
       }}
     >

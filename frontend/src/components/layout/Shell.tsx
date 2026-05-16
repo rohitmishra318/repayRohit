@@ -86,7 +86,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const nav = role === 'admin' ? ADMIN_NAV : STUDENT_NAV;
 
-  const displayName = role === 'admin' ? 'Admin User' : (student?.name ?? 'Student');
+  const displayName = role === 'admin' ? 'Admin' : (student?.name ?? 'Student');
   const userEmail = role === 'admin' ? 'admin@repaysignal.io' : (student?.email ?? '');
   const initials = displayName.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
 

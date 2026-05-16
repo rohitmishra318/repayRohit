@@ -1,0 +1,22 @@
+version: '3.8'
+
+# Development override for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  backend:
+    # Use bind mount for live code reloading
+    volumes:
+      - ./backend:/app/backend
+      - ./models_cache:/app/models_cache
+    # Enable auto-reload on code changes
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    # Use bind mount for live code reloading
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+    ports:
+      - "5173:5173"  # Vite dev server port (if needed for development)

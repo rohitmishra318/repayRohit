@@ -160,4 +160,8 @@ async def score_student(student_id: str, db: Session) -> dict:
         db.add(RiskScore(id=str(uuid.uuid4()), student_id=student_id, **db_fields))
     db.commit()
 
+    # Synchronous Alert Trigger Evaluation
+    from backend.services.trigger_service import process_triggers
+    process_triggers(student, db)
+
     return result

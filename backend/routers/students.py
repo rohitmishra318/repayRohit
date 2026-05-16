@@ -92,4 +92,9 @@ async def update_student(student_id: str, payload: StudentUpdate, db: Session = 
 
     db.commit()
     db.refresh(student)
+
+    # Synchronous Alert Trigger Evaluation
+    from backend.services.trigger_service import process_triggers
+    process_triggers(student, db)
+
     return {"status": "success", "message": "Profile updated successfully"}

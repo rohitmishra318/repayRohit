@@ -36,7 +36,7 @@ def process_triggers(student: Student, db: Session) -> list:
                 existing.deadline = deadline
             else:
                 db.add(AlertState(
-                    id=uuid.uuid4(),
+                    id=str(uuid.uuid4()),
                     student_id=student.student_id,
                     trigger_id=trigger["id"],
                     trigger_name=trigger["name"],

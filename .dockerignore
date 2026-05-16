@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env.local
+README.md
+CHECKLIST.md
+IMPLEMENTATION_SUMMARY.md
+AUTHENTICATION_COMPLETE.md
+FIREBASE_SETUP.md
+BACKEND_STRUCTURE.md
+FRONTEND_STRUCTURE.md
+Frontend_Architecture.md
+*.md
+.vscode
+.DS_Store
+*.db-journal

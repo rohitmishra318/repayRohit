@@ -123,6 +123,39 @@ repaysignal/
 
 ---
 
+## Docker Setup (Recommended)
+
+The easiest way to run RepaySignal is with Docker. This eliminates environment setup issues and ensures consistency across machines.
+
+### Quick Start
+
+**Prerequisites**: Docker Desktop (Windows/Mac) or Docker + Docker Compose (Linux)
+
+**Windows Users:**
+```bash
+docker-start.bat
+```
+
+**Mac/Linux Users:**
+```bash
+chmod +x docker-start.sh
+./docker-start.sh
+```
+
+**Or use Docker Compose directly:**
+```bash
+docker-compose up --build
+```
+
+### Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+
+See [DOCKER.md](DOCKER.md) for detailed Docker instructions and the development guide.
+
+---
+
 ## Setup & Installation
 
 ### 1. Clone the repository

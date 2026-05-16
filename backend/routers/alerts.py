@@ -42,6 +42,7 @@ def list_alerts(
             "deadline": str(a.deadline) if a.deadline else None,
             "action_taken": a.action_taken,
         })
+    print("\n\n\n\nresult", result) 
     return result
 
 

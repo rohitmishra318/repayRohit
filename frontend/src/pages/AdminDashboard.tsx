@@ -113,11 +113,6 @@ export function AdminDashboard() {
 
         {/* ── Dark-mode ambient layer ── */}
         <div className="dark:block hidden fixed inset-0 pointer-events-none overflow-hidden z-0">
-          {/* Orbs */}
-          <div className="orb-drift absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%)' }} />
-          <div className="orb-drift absolute bottom-[-15%] right-[-8%] w-[500px] h-[500px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)', animationDelay: '-6s' }} />
           {/* Grid */}
           <div className="grid-pulse absolute inset-0"
             style={{

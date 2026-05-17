@@ -571,8 +571,8 @@ export function HomePage() {
                       key={m}
                       onClick={() => { setMode(m); setSignupStep('basic'); setError(''); }}
                       className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all font-body ${mode === m
-                          ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
-                          : 'text-white/35 hover:text-white/60'
+                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
+                        : 'text-white/35 hover:text-white/60'
                         }`}
                     >
                       {m === 'login' ? 'Sign In' : 'Create Account'}
@@ -587,10 +587,10 @@ export function HomePage() {
                       {STEPS.map((s, i) => (
                         <div key={s} className="flex flex-col items-center gap-1">
                           <div className={`w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition-all font-body ${i < currentStepIndex
-                              ? 'bg-violet-500 text-white'
-                              : i === currentStepIndex
-                                ? 'bg-violet-500/20 border-2 border-violet-500 text-violet-400'
-                                : 'bg-white/5 text-white/20'
+                            ? 'bg-violet-500 text-white'
+                            : i === currentStepIndex
+                              ? 'bg-violet-500/20 border-2 border-violet-500 text-violet-400'
+                              : 'bg-white/5 text-white/20'
                             }`}>
                             {i < currentStepIndex ? (
                               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

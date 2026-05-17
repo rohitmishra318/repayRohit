@@ -77,10 +77,6 @@ export function StudentDetailPage() {
 
         {/* ── Dark ambient layer ── */}
         <div className="dark:block hidden fixed inset-0 pointer-events-none overflow-hidden z-0">
-          <div className="orb-drift absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.09) 0%, transparent 70%)' }} />
-          <div className="orb-drift absolute bottom-[-15%] left-[-5%] w-[400px] h-[400px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%)', animationDelay: '-7s' }} />
           <div className="grid-pulse absolute inset-0"
             style={{
               backgroundImage: 'linear-gradient(rgba(139,92,246,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.07) 1px,transparent 1px)',

@@ -105,10 +105,6 @@ export function StudentDashboard() {
 
         {/* ── Dark ambient layer ── */}
         <div className="dark:block hidden fixed inset-0 pointer-events-none overflow-hidden z-0">
-          <div className="orb-drift absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.09) 0%, transparent 70%)' }} />
-          <div className="orb-drift absolute bottom-[-15%] left-[-5%] w-[400px] h-[400px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%)', animationDelay: '-7s' }} />
           <div className="grid-pulse absolute inset-0"
             style={{
               backgroundImage: 'linear-gradient(rgba(139,92,246,0.07) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,0.07) 1px,transparent 1px)',
@@ -146,49 +142,87 @@ export function StudentDashboard() {
                 <div>
                   <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
 
-                  {/* Internal Data Grid */}
-                  <div className="mt-8 pt-6 border-t border-slate-200/60 dark:border-white/10 grid grid-cols-2 gap-x-6 gap-y-6">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Repayment Stress</p>
-                      <p className={`text-sm font-bold font-mono ${risk.repayment_stress_index >= 0.7 ? 'text-red-600 dark:text-red-400' :
-                        risk.repayment_stress_index >= 0.5 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
-                        }`}>
-                        {risk.repayment_stress_label || 'MODERATE'}
-                      </p>
+                  {/* ── Internal Data Grid ── */}
+                  <div className="mt-8 pt-6 border-t border-slate-200/60 dark:border-white/10 flex flex-col gap-6">
+
+                    {/* Top Row: Quick Financials */}
+                    <div className="grid grid-cols-2 gap-x-6">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Repayment Stress</p>
+                        <p className={`text-sm font-bold font-mono ${risk.repayment_stress_index >= 0.7 ? 'text-red-600 dark:text-red-400' :
+                            risk.repayment_stress_index >= 0.5 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
+                          }`}>
+                          {risk.repayment_stress_label || 'MODERATE'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Monthly EMI</p>
+                        <p className="text-sm font-bold font-mono text-slate-800 dark:text-white">
+                          ₹{(student?.loan_emi_monthly || 0).toLocaleString('en-IN')}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Est. Salary Range</p>
-                      <p className="text-sm font-bold font-mono text-slate-800 dark:text-white">
-                        ₹{(risk.predicted_salary_lower / 100000).toFixed(1)}–{(risk.predicted_salary_upper / 100000).toFixed(1)}L
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Monthly EMI</p>
-                      <p className="text-sm font-bold font-mono text-slate-800 dark:text-white">
-                        ₹{student.loan_emi_monthly.toLocaleString('en-IN')}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 dark:text-white/40 uppercase tracking-widest font-display mb-1.5">Data Trust Weight</p>
-                      <p className="text-sm font-bold font-mono text-slate-800 dark:text-white">
-                        {(risk.data_trust_weight * 100).toFixed(0)}%
-                      </p>
+
+                    {/* Bottom Row: Visual Indicators Sub-Card */}
+                    <div className="flex flex-col gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5">
+
+                      {/* 1. Est Salary Range Visual */}
+                      <div>
+                        <div className="flex justify-between items-end mb-2.5">
+                          <p className="text-[10px] font-bold text-slate-500 dark:text-white/50 uppercase tracking-widest font-display">Est. Salary Range</p>
+                          <p className="text-[13px] font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                            ₹{(risk.predicted_salary_lower / 100000).toFixed(1)}–{(risk.predicted_salary_upper / 100000).toFixed(1)}L
+                          </p>
+                        </div>
+                        <div className="relative w-full h-1.5 bg-slate-200/80 dark:bg-white/10 rounded-full overflow-hidden">
+                          {/* Calculate dynamic width based on an assumed 15L ceiling for visual scaling */}
+                          <div
+                            className="absolute h-full bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.4)]"
+                            style={{
+                              left: `${Math.min(80, (risk.predicted_salary_lower / 1500000) * 100)}%`,
+                              width: `${Math.min(100, ((risk.predicted_salary_upper - risk.predicted_salary_lower) / 1500000) * 100)}%`
+                            }}
+                          />
+                        </div>
+                        <div className="flex justify-between mt-2 text-[9px] font-bold font-mono text-slate-400 dark:text-white/30 uppercase tracking-widest">
+                          <span>Min Base</span>
+                          <span>Market Top</span>
+                        </div>
+                      </div>
+
+                      {/* 2. Data Trust Weight Visual */}
+                      <div className="pt-1">
+                        <div className="flex justify-between items-end mb-2.5">
+                          <p className="text-[10px] font-bold text-slate-500 dark:text-white/50 uppercase tracking-widest font-display">Data Trust Weight</p>
+                          <p className="text-[13px] font-bold font-mono text-slate-800 dark:text-white">
+                            {(risk.data_trust_weight * 100).toFixed(0)}%
+                          </p>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-200/80 dark:bg-white/10 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-violet-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.4)] transition-all duration-1000 ease-out"
+                            style={{ width: `${risk.data_trust_weight * 100}%` }}
+                          />
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </div>
 
                 {/* Human Review Note */}
                 {risk.needs_human_review && (
-                  <div className="mt-8 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-800/30 rounded-2xl p-4 flex items-start gap-3">
-                    <span className="text-xl leading-none">⚠</span>
-                    <span className="text-[13px] font-medium text-amber-800 dark:text-amber-400 leading-relaxed font-body">
+                  <div className="mt-6 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-800/30 rounded-2xl p-4 flex items-start gap-3">
+                    <span className="text-amber-500 dark:text-amber-400 shrink-0 mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                    </span>
+                    <span className="text-[12px] font-medium text-amber-800 dark:text-amber-300 leading-relaxed font-body">
                       Wide uncertainty limits detected. Manual counselor review is recommended.
                     </span>
                   </div>
                 )}
               </div>
             </div>
-
             {/* ==============================================================
                 COLUMN 2: DRIVERS & INTERVENTIONS
             ============================================================== */}

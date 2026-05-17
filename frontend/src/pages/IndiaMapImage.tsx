@@ -2,6 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import Map, { Marker, Popup, NavigationControl } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import type { StudentListItem } from '../types';
+import { useTheme } from '../context/ThemeContext';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -51,6 +52,7 @@ function inferState(student: StudentListItem): string {
 }
 
 export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
+  const { theme } = useTheme();
   const mapRef = useRef<any>(null);
   const [hoveredState, setHoveredState] = useState<string | null>(null);
 
@@ -75,8 +77,9 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
 
   const maxCount = Math.max(...Object.values(stateStats).map((s: any) => s.count), 1);
 
+
   return (
-    <div className="relative w-full h-[550px] rounded-2xl overflow-hidden border border-white/5 bg-[#0d0d1f]">
+    <>
       {/* Global CSS for the ripple animation */}
       <style>{`
         @keyframes ripple {
@@ -97,102 +100,113 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
           color: white !important;
           padding: 12px !important;
         }
+        /* Vignette overlay to blend map edges */
+        .map-vignette {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          z-index: 5;
+          background: radial-gradient(circle at center, transparent 30%, #f8fafc 100%);
+        }
+        .dark .map-vignette {
+          background: radial-gradient(circle at center, transparent 30%, #080812 100%);
+        }
         .mapboxgl-popup-tip {
           border-top-color: rgba(18, 18, 31, 0.9) !important;
         }
       `}</style>
 
-      <Map
-        ref={mapRef}
-        initialViewState={{ longitude: 78.9629, latitude: 22.5937, zoom: 4.2 }}
-        style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/mapbox/dark-v11"
-        mapboxAccessToken={MAPBOX_TOKEN}
-        attributionControl={false}
-      >
-        <NavigationControl position="top-right" />
+      <div className={`relative w-full h-[550px] rounded-2xl overflow-hidden border ${theme === 'dark' ? 'border-white/5 bg-[#0d0d1f]' : 'border-slate-200 bg-white'}`}>
+        {/* The Vignette */}
+        <div className="map-vignette" />
 
-        {Object.entries(STATE_COORDS).map(([name, coord]) => {
-          const stats = stateStats[name];
-          if (!stats || stats.count === 0) return null;
+        <Map
+          ref={mapRef}
+          initialViewState={{ longitude: 78.9629, latitude: 22.5937, zoom: 4.2 }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11"}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          attributionControl={false}
+        >
+          <NavigationControl position="top-right" />
 
-          const isHigh = stats.avgRisk >= 0.75;
-          const isMid = stats.avgRisk >= 0.55;
+          {Object.entries(STATE_COORDS).map(([name, coord]) => {
+            const stats = stateStats[name];
+            if (!stats || stats.count === 0) return null;
 
-          // Using the teal/green theme from the image
-          const coreColor = isHigh ? '#ef4444' : isMid ? '#f59e0b' : '#34d399';
-          const size = 8 + (stats.count / maxCount) * 16;
+            const isHigh = stats.avgRisk >= 0.75;
+            const isMid = stats.avgRisk >= 0.55;
+            const coreColor = isHigh ? '#ef4444' : isMid ? '#f59e0b' : '#34d399';
+            const size = 8 + (stats.count / maxCount) * 16;
 
-          return (
-            <React.Fragment key={name}>
-              <Marker longitude={coord.lng} latitude={coord.lat} anchor="center">
-                <div
-                  className="relative cursor-pointer group"
-                  onMouseEnter={() => setHoveredState(name)}
-                  onMouseLeave={() => setHoveredState(null)}
-                >
-                  {/* Ripple Effect */}
+            return (
+              <React.Fragment key={name}>
+                <Marker longitude={coord.lng} latitude={coord.lat} anchor="center">
                   <div
-                    className="ripple"
-                    style={{
-                      width: size, height: size,
-                      backgroundColor: coreColor,
-                      left: 0, top: 0
-                    }}
-                  />
-
-                  {/* Core Dot */}
-                  <div
-                    className="relative transition-all duration-300 group-hover:scale-125 shadow-lg"
-                    style={{
-                      width: size,
-                      height: size,
-                      backgroundColor: coreColor,
-                      borderRadius: '50%',
-                      border: '1.5px solid rgba(255,255,255,0.4)',
-                      boxShadow: `0 0 20px ${coreColor}`,
-                    }}
-                  />
-                </div>
-              </Marker>
-
-              {hoveredState === name && (
-                <Popup
-                  longitude={coord.lng}
-                  latitude={coord.lat}
-                  anchor="bottom"
-                  closeButton={false}
-                  offsetTop={-size}
-                >
-                  <div className="font-display">
-                    <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">State Details</p>
-                    <h3 className="font-bold text-sm text-white mb-2">{name}</h3>
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="text-xs text-slate-300">Borrowers</span>
-                      <span className="text-xs font-bold">{stats.count}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-4 mt-1">
-                      <span className="text-xs text-slate-300">Risk Level</span>
-                      <span className="text-xs font-bold" style={{ color: coreColor }}>
-                        {(stats.avgRisk * 100).toFixed(1)}%
-                      </span>
-                    </div>
+                    className="relative cursor-pointer group"
+                    onMouseEnter={() => setHoveredState(name)}
+                    onMouseLeave={() => setHoveredState(null)}
+                  >
+                    <div
+                      className="ripple"
+                      style={{
+                        width: size, height: size,
+                        backgroundColor: coreColor,
+                        left: 0, top: 0
+                      }}
+                    />
+                    <div
+                      className="relative transition-all duration-300 group-hover:scale-125 shadow-lg"
+                      style={{
+                        width: size,
+                        height: size,
+                        backgroundColor: coreColor,
+                        borderRadius: '50%',
+                        border: '1.5px solid rgba(255,255,255,0.4)',
+                        boxShadow: `0 0 20px ${coreColor}`,
+                      }}
+                    />
                   </div>
-                </Popup>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </Map>
+                </Marker>
 
-      {/* Floating Header Label */}
-      <div className="absolute top-4 left-4 z-10">
-        <div className="bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-lg">
-          <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-medium">
-            Live Risk Spread
-          </p>
-        </div>
+                {hoveredState === name && (
+                  <Popup
+                    longitude={coord.lng}
+                    latitude={coord.lat}
+                    anchor="bottom"
+                    closeButton={false}
+                    offsetTop={-size}
+                  >
+                    <div className="font-display">
+                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">State Details</p>
+                      <h3 className="font-bold text-sm text-white dark:text-white mb-2">{name}</h3>
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-xs text-slate-300">Borrowers</span>
+                        <span className="text-xs font-bold">{stats.count}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-4 mt-1">
+                        <span className="text-xs text-slate-300">Risk Level</span>
+                        <span className="text-xs font-bold" style={{ color: coreColor }}>
+                          {(stats.avgRisk * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                  </Popup>
+                )}
+              </React.Fragment>
+            );
+          })}
+
+          {/* Floating Header Label */}
+          <div className="absolute top-4 left-4 z-10">
+            <div className={`${theme === 'dark' ? 'bg-black/40 border-white/10' : 'bg-white/40 border-slate-200'} backdrop-blur-md border px-3 py-1.5 rounded-lg`}>
+              <p className={`text-[10px] ${theme === 'dark' ? 'text-white/50' : 'text-slate-500'} uppercase tracking-[0.2em] font-medium`}>
+                Live Risk Spread
+              </p>
+            </div>
+          </div>
+        </Map>
       </div>
-    </div>
+    </>
   );
 }

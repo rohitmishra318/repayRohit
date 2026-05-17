@@ -90,7 +90,9 @@ async def get_risk_card(body: RiskCardRequest, db: Session = Depends(get_db)):
         if risk_score:
             risk_score.xai_card_text = text
             db.commit()
-
+    print("=== RISK CARD ===")
+    print(text)
+    print("==================") 
     return {
         "student_id": body.student_id,
         "risk_summary": text,

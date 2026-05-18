@@ -21,7 +21,6 @@ export function useMyProfile() {
   return useQuery({
     queryKey: ['my-profile'],
     queryFn: () => studentsApi.getMyProfile(),
-    queryFn: () => studentsApi.getMyProfile(),
   });
 }
 
@@ -32,9 +31,11 @@ export function useUpdateProfile() {
     mutationFn: ({ id, data }: { id: string; data: import('../types/index').StudentUpdatePayload }) => 
       studentsApi.updateProfile(id, data),
     onSuccess: (_, { id }) => {
-      // Invalidate both the specific student and the general profile
+      // Invalidate both the specific student, general profile, and risk/insight queries
       queryClient.invalidateQueries({ queryKey: ['student', id] });
       queryClient.invalidateQueries({ queryKey: ['my-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['risk', id] });
+      queryClient.invalidateQueries({ queryKey: ['risk-card', id] });
     },
   });
 }

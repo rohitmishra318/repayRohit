@@ -13,6 +13,7 @@ import { StudentDetailPage } from './pages/StudentDetailPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { SectorRiskPage } from './pages/SectorRiskPage';
 import { StressTestPage } from './pages/StressTestPage';
+import { AboutPage } from './pages/AboutPage';
 import { FirebaseConfigError } from './components/auth/FirebaseConfigError';
 import { Spinner } from './components/shared/Spinner';
 import { ReactNode } from 'react';
@@ -48,7 +49,13 @@ function AppRoutes() {
   }
 
   if (!isAuthenticated) {
-    return <HomePage />;
+    return (
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
   }
 
   return (

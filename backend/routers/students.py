@@ -47,6 +47,7 @@ async def list_students(
             "placement_status": s.placement_status,
             "institute_tier": inst.tier if inst else None,
         })
+
     return result
 
 
@@ -93,8 +94,8 @@ async def update_student(student_id: str, payload: StudentUpdate, db: Session = 
     db.commit()
     db.refresh(student)
 
-    # Synchronous Alert Trigger Evaluation
-    from backend.services.trigger_service import process_triggers
-    process_triggers(student, db)
+    # Recalculate risk score and trigger alerts with the new profile data
+    from backend.services.risk_service import score_student
+    await score_student(student_id, db)
 
     return {"status": "success", "message": "Profile updated successfully"}

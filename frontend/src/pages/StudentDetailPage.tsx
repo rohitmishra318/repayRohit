@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStudent, useRisk, useRiskCard, useInterventions, useAlerts } from '../hooks';
 import { PageHeader } from '../components/layout/PageHeader';
-import { Card } from '../components/shared/Card';
 import { Spinner } from '../components/shared/Spinner';
 import { RiskBadge } from '../components/shared/RiskBadge';
 import { PlacementTimeline } from '../components/student/PlacementTimeline';
@@ -22,7 +21,7 @@ export function StudentDetailPage() {
 
   if (sLoading || rLoading) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-50/50">
+      <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-[#080812]">
         <Spinner label="Loading student risk profile..." size="lg" />
       </div>
     );
@@ -43,20 +42,15 @@ export function StudentDetailPage() {
         .font-mono    { font-family: 'JetBrains Mono', monospace; }
 
         @keyframes cardReveal {
-          from { opacity: 0; transform: translateY(16px); }
+          from { opacity: 0; transform: translateY(20px); }
           to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes orbDrift {
-          0%,100% { transform: translate(0,0) scale(1); }
-          50%      { transform: translate(25px,-18px) scale(1.05); }
         }
         @keyframes gridPulse {
           0%,100% { opacity: 0.04; }
           50%      { opacity: 0.075; }
         }
 
-        .card-reveal { animation: cardReveal 0.55s cubic-bezier(0.22,1,0.36,1) both; }
-        .orb-drift   { animation: orbDrift 14s ease-in-out infinite; }
+        .card-reveal { animation: cardReveal 0.6s cubic-bezier(0.22,1,0.36,1) both; }
         .grid-pulse  { animation: gridPulse 5s ease-in-out infinite; }
 
         /* glass card — dual theme */
@@ -71,9 +65,14 @@ export function StudentDetailPage() {
           border: 1px solid rgba(255,255,255,0.06);
           box-shadow: none;
         }
+
+        /* Custom scrollbar for inner elements */
+        .inner-scroll::-webkit-scrollbar { width: 4px; }
+        .inner-scroll::-webkit-scrollbar-track { background: transparent; }
+        .inner-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
       `}</style>
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin bg-slate-50 dark:bg-[#080812] font-body relative min-h-screen">
+      <div className="flex-1 overflow-y-auto scrollbar-thin bg-slate-50 dark:bg-[#080812] font-body relative min-h-screen pb-20">
 
         {/* ── Dark ambient layer ── */}
         <div className="dark:block hidden fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -99,7 +98,7 @@ export function StudentDetailPage() {
               <div className="flex items-center gap-4">
                 <RiskBadge tier={tier} score={risk.risk_score} size="md" />
                 <button onClick={() => navigate(-1)}
-                  className="text-sm font-bold font-display text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100 border border-slate-200/80 dark:border-white/10 px-4 py-2 rounded-xl shadow-sm dark:shadow-none transition-all backdrop-blur-sm">
+                  className="text-[13px] font-bold font-display tracking-wide text-slate-700 dark:text-white/80 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 px-5 py-2.5 rounded-xl shadow-sm dark:shadow-none transition-all active:scale-95">
                   ← Back to List
                 </button>
               </div>
@@ -109,181 +108,178 @@ export function StudentDetailPage() {
 
         <div className="relative z-10 p-6 max-w-[1600px] mx-auto space-y-6">
 
-          {/* Adjusted Grid: Better responsiveness for complex cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-6 items-stretch">
+          {/* ── ROW 1: Executive Overview (Profile, Risk Gauge & Timeline) ── */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
 
-            {/* ==============================================================
-                COLUMN 1: PROFESSIONAL CANDIDATE DATA SHEET (Redesigned)
-            ============================================================== */}
-            <div className="col-span-1 md:col-span-1 xl:col-span-3 flex flex-col card-reveal" style={{ animationDelay: '0ms' }}>
-              <div className="glass-card rounded-3xl h-full flex flex-col p-6 lg:p-8">
+            {/* Profile Card */}
+            <div className="glass-card rounded-3xl flex flex-col p-8 card-reveal h-full justify-between" style={{ animationDelay: '0ms' }}>
+              <div className="mb-7 pb-6 border-b border-slate-200/60 dark:border-white/5">
+                <h2 className="text-3xl font-bold font-display text-slate-900 dark:text-white tracking-tight leading-tight mb-2">
+                  {student.name}
+                </h2>
+                <p className="text-xs font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest mb-5 font-display">
+                  {student.course_type}
+                </p>
+                <div className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider border font-display ${student.placement_status === 'placed'
+                  ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
+                  : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20'
+                  }`}>
+                  <span className={`w-2 h-2 rounded-full ${student.placement_status === 'placed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></span>
+                  {student.placement_status}
+                </div>
+              </div>
 
-                {/* Header without image */}
-                <div className="mb-6 pb-5 border-b border-slate-100 dark:border-white/5">
-                  <h2 className="text-2xl font-bold font-display text-slate-900 dark:text-slate-100 tracking-tight leading-tight mb-1">
-                    {student.name}
-                  </h2>
-                  <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4 font-display">
-                    {student.course_type}
-                  </p>
-
-                  {/* Status Pill */}
-                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-[11px] font-bold uppercase tracking-wider border font-display ${student.placement_status === 'placed'
-                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20'
-                    : 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/20'
-                    }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${student.placement_status === 'placed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></span>
-                    {student.placement_status}
-                  </div>
+              <div className="flex-1 flex flex-col">
+                <h3 className="text-[11px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.15em] mb-5 font-display">Core Metrics</h3>
+                <div className="space-y-4 flex-1 font-body">
+                  {[
+                    { label: 'Institute Tier', value: student.institute_tier },
+                    { label: 'Cumulative GPA', value: student.cgpa?.toFixed(2), highlight: true },
+                    { label: 'Internship Base', value: student.internship_employer_tier },
+                    { label: 'PPO Status', value: student.ppo_exists ? 'Secured' : 'None' },
+                    { label: 'Certifications', value: student.cert_count },
+                    { label: 'Monthly EMI', value: `₹${Number(student.loan_emi_monthly).toLocaleString('en-IN')}` },
+                    { label: 'Target City', value: `Tier ${student.target_city_tier}` },
+                  ].map(item => (
+                    <div key={item.label} className="flex justify-between items-center group py-1">
+                      <span className="text-[13px] text-slate-500 dark:text-white/40">{item.label}</span>
+                      <span className={`text-[13px] font-medium ${item.highlight ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-white/80'}`}>
+                        {item.value ?? '—'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Data Rows */}
-                <div className="flex-1 flex flex-col">
-                  <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] mb-4 font-display">Core Metrics</h3>
-
-                  <div className="space-y-3.5 flex-1 font-body">
-                    {[
-                      { label: 'Institute Tier', value: student.institute_tier },
-                      { label: 'Cumulative GPA', value: student.cgpa?.toFixed(2), highlight: true },
-                      { label: 'Internship Base', value: student.internship_employer_tier },
-                      { label: 'PPO Status', value: student.ppo_exists ? 'Secured' : 'None' },
-                      { label: 'Certifications', value: student.cert_count },
-                      { label: 'Monthly EMI', value: `₹${Number(student.loan_emi_monthly).toLocaleString('en-IN')}` },
-                      { label: 'Target City', value: `Tier ${student.target_city_tier}` },
-                    ].map(item => (
-                      <div key={item.label} className="flex justify-between items-center group">
-                        <span className="text-[13px] text-slate-500 dark:text-white/40">{item.label}</span>
-                        <span className={`text-[13px] font-medium ${item.highlight ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-white/70'}`}>
-                          {item.value ?? '—'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer stat */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02] p-3 rounded-xl">
-                    <span className="text-[11px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest font-display">Data Trust</span>
-                    <span className="text-sm font-bold text-slate-800 dark:text-white font-mono">
-                      {((student.data_trust_score || 0.5) * 100).toFixed(0)}%
-                    </span>
-                  </div>
+                <div className="mt-8 pt-5 border-t border-slate-200/60 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02] p-4 rounded-2xl">
+                  <span className="text-[11px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest font-display">Data Trust</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-white font-mono">
+                    {((student.data_trust_score || 0.5) * 100).toFixed(0)}%
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* ==============================================================
-                COLUMN 2: RISK ANALYTICS
-            ============================================================== */}
-            <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full card-reveal" style={{ animationDelay: '100ms' }}>
-              <div className="glass-card rounded-3xl flex-1 flex flex-col justify-center p-6 lg:p-8 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 to-indigo-500"></div>
-                <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-5">Current Risk Score</h2>
-                <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
+            {/* Risk Gauge */}
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden card-reveal h-full" style={{ animationDelay: '100ms' }}>
+              <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-6">Current Risk Score</h2>
+              <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
+              {risk.needs_human_review && (
+                <div className="mt-6 bg-amber-50/80 dark:bg-amber-900/10 border border-amber-200/80 dark:border-amber-800/30 rounded-2xl p-4 text-[12px] text-amber-800 dark:text-amber-400/90 flex items-start gap-3">
+                  <span className="text-lg leading-none">⚠</span>
+                  <span className="font-medium leading-relaxed font-body">Wide uncertainty limits detected. Manual counselor review recommended.</span>
+                </div>
+              )}
+            </div>
 
-                {risk.needs_human_review && (
-                  <div className="mt-5 bg-amber-50/80 dark:bg-amber-900/20 border border-amber-200/80 dark:border-amber-800/30 rounded-xl p-4 text-xs text-amber-800 dark:text-amber-400 flex items-start gap-2">
-                    <span className="text-base leading-none">⚠</span>
-                    <span className="font-medium leading-relaxed font-body">Wide uncertainty limits detected. Manual counselor review is recommended.</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="glass-card rounded-3xl flex-1 flex flex-col p-6 lg:p-8">
+            {/* Placement Timeline */}
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between card-reveal h-full md:col-span-2 xl:col-span-1" style={{ animationDelay: '250ms' }}>
+              <div>
                 <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-1">Placement Timeline</h2>
-                <p className="text-[13px] text-slate-500 dark:text-white/50 mb-5 font-body font-medium">Probability over time</p>
-                <div className="flex-1 flex items-center justify-center bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl p-4 border border-slate-100 dark:border-white/5">
-                  <PlacementTimeline p_3mo={risk.p_3mo} p_6mo={risk.p_6mo} p_12mo={risk.p_12mo} />
-                </div>
+                <p className="text-[12px] text-slate-500 dark:text-white/40 mb-6 font-body font-medium">Probability over time</p>
+              </div>
+              <div className="flex-1 flex items-center justify-center bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl p-5 border border-slate-100 dark:border-white/5 h-full">
+                <PlacementTimeline p_3mo={risk.p_3mo} p_6mo={risk.p_6mo} p_12mo={risk.p_12mo} />
               </div>
             </div>
 
-            {/* ==============================================================
-                COLUMN 3: AI & CAUSAL DRIVERS
-            ============================================================== */}
-            <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full card-reveal" style={{ animationDelay: '200ms' }}>
-              <div className="glass-card rounded-3xl flex-1 flex flex-col p-6 lg:p-8">
-                <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-1">Risk Drivers (SHAP)</h2>
-                <p className="text-[13px] text-slate-500 dark:text-white/50 mb-5 font-body font-medium">Key causal variables</p>
-                <div className="flex-1 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl p-4 border border-slate-100 dark:border-white/5">
-                  <ShapDrivers drivers={risk.shap_drivers} />
-                </div>
-              </div>
+          </div>
 
-              <div className="glass-card rounded-3xl flex-1 flex flex-col p-6 lg:p-8 border-t-4 border-t-violet-500 relative overflow-hidden">
-                <div className="flex items-center justify-between mb-5">
+          {/* ── ROW 2: Deep Analytics (AI Narrative & SHAP Drivers) ── */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+            {/* AI Narrative (Scrollable block - spans 8/12 columns) */}
+            <div className="glass-card rounded-3xl p-8 flex flex-col border-t-4 border-t-violet-500 card-reveal xl:col-span-8 h-full justify-between" style={{ animationDelay: '150ms' }}>
+              <div>
+                <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white">AI Narrative</h2>
-                  <span className="px-2 py-1 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 text-[10px] font-bold rounded uppercase tracking-wider border border-violet-100 dark:border-violet-500/20 font-display">
+                  <span className="px-3 py-1.5 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-400 text-[10px] font-bold rounded-lg uppercase tracking-widest border border-violet-100 dark:border-violet-500/20 font-display">
                     Conformal
                   </span>
                 </div>
+              </div>
 
-                <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin max-h-[300px]">
-                  {cardLoading ? (
-                    <div className="flex flex-col items-center justify-center h-full space-y-3">
-                      <Spinner size="sm" />
-                      <span className="text-[11px] font-bold tracking-widest uppercase text-slate-400 font-display">Generating...</span>
-                    </div>
-                  ) : riskCard ? (
-                    <div className="text-[13px] text-slate-600 dark:text-white/70 leading-relaxed font-body">
-                      <ReactMarkdown
-                        components={{
-                          h2: ({ node, ...props }) => <h3 className="font-bold text-[11px] text-slate-400 dark:text-white/40 uppercase tracking-widest mt-4 mb-3 font-display" {...props} />,
-                          p: ({ node, ...props }) => <p className="mb-4" {...props} />,
-                          ul: ({ node, ...props }) => <ul className="list-none space-y-3 mb-4" {...props} />,
-                          li: ({ node, ...props }) => (
-                            <li className="flex items-start gap-3 bg-slate-50/50 dark:bg-white/[0.02] p-3 rounded-xl border border-slate-100 dark:border-white/5">
-                              <span className="text-violet-500 mt-0.5">•</span>
-                              <span className="flex-1">{props.children}</span>
-                            </li>
-                          ),
-                          strong: ({ node, ...props }) => <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded" {...props} />
-                        }}
-                      >
-                        {riskCard.risk_summary}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-[13px] font-medium text-slate-400 dark:text-white/30 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-dashed border-slate-200 dark:border-white/10 p-6 text-center font-body">
-                      AI narrative is currently unavailable for this student record.
-                    </div>
-                  )}
-                </div>
+              {/* Scroll box height adjusted perfectly */}
+              <div className="overflow-y-auto pr-3 inner-scroll flex-1 max-h-[360px] min-h-[300px]">
+                {cardLoading ? (
+                  <div className="flex flex-col items-center justify-center h-full space-y-4 py-12">
+                    <Spinner size="sm" />
+                    <span className="text-[11px] font-bold tracking-widest uppercase text-slate-400 dark:text-white/40 font-display">Generating Analysis...</span>
+                  </div>
+                ) : riskCard ? (
+                  <div className="text-[13px] text-slate-600 dark:text-white/70 leading-relaxed font-body">
+                    <ReactMarkdown
+                      components={{
+                        h2: ({ node, ...props }) => <h3 className="font-bold text-[11px] text-slate-500 dark:text-white/40 uppercase tracking-widest mt-6 mb-3 font-display first:mt-0" {...props} />,
+                        p: ({ node, ...props }) => <p className="mb-4" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-none space-y-3 mb-5" {...props} />,
+                        li: ({ node, ...props }) => (
+                          <li className="flex items-start gap-3 bg-slate-50/80 dark:bg-white/[0.02] p-4 rounded-2xl border border-slate-200/60 dark:border-white/5">
+                            <span className="text-violet-500 dark:text-violet-400 mt-0.5">•</span>
+                            <span className="flex-1">{props.children}</span>
+                          </li>
+                        ),
+                        strong: ({ node, ...props }) => <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded-md" {...props} />
+                      }}
+                    >
+                      {riskCard.risk_summary}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-[13px] font-medium text-slate-400 dark:text-white/30 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-dashed border-slate-200 dark:border-white/10 text-center font-body py-12">
+                    AI narrative is currently unavailable for this student record.
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* ==============================================================
-                COLUMN 4: ACTIONS & ALERTS
-            ============================================================== */}
-            <div className="col-span-1 md:col-span-1 xl:col-span-3 space-y-6 flex flex-col h-full card-reveal" style={{ animationDelay: '300ms' }}>
-              <div className="glass-card rounded-3xl flex-1 flex flex-col p-6 lg:p-8">
-                <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-1">Interventions</h2>
-                <p className="text-[13px] text-slate-500 dark:text-white/50 mb-5 font-body font-medium">Ranked by placement impact</p>
-                <div className="flex-1 overflow-y-auto pr-1 scrollbar-thin">
-                  <InterventionCards interventions={interventions?.interventions || []} />
-                </div>
+            {/* SHAP Drivers (spans 4/12 columns) */}
+            <div className="glass-card rounded-3xl p-8 flex flex-col justify-between card-reveal xl:col-span-4 h-full" style={{ animationDelay: '200ms' }}>
+              <div>
+                <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-1">Risk Drivers (SHAP)</h2>
+                <p className="text-[12px] text-slate-500 dark:text-white/40 mb-6 font-body font-medium">Key causal variables</p>
               </div>
+              <div className="bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl p-5 border border-slate-100 dark:border-white/5 flex-1 flex flex-col justify-center">
+                <ShapDrivers drivers={risk.shap_drivers} />
+              </div>
+            </div>
 
-              {studentAlerts.length > 0 && (
-                <div className="glass-card rounded-3xl shrink-0 p-6 lg:p-8 bg-white/95 dark:bg-slate-900/95">
+          </div>
+
+          {/* ── ROW 3: Interventions & Active Alerts ── */}
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+
+            {/* Interventions */}
+            <div className={`glass-card rounded-3xl p-8 flex flex-col justify-between card-reveal h-full ${studentAlerts.length > 0 ? 'xl:col-span-8' : 'xl:col-span-12'}`} style={{ animationDelay: '300ms' }}>
+              <div>
+                <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-1">Interventions</h2>
+                <p className="text-[12px] text-slate-500 dark:text-white/40 mb-6 font-body font-medium">Ranked by placement impact</p>
+              </div>
+              <div className="flex-1">
+                <InterventionCards interventions={interventions?.interventions || []} layout="grid" />
+              </div>
+            </div>
+
+            {/* Active Alerts (Shown if any exist - spans 4/12 columns) */}
+            {studentAlerts.length > 0 && (
+              <div className="glass-card rounded-3xl p-8 border-l-4 border-l-rose-500 card-reveal xl:col-span-4 flex flex-col justify-between h-full" style={{ animationDelay: '50ms' }}>
+                <div>
                   <div className="flex items-center justify-between mb-5">
                     <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white">Active Alerts</h2>
-                    <span className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400 text-[10px] font-bold font-mono px-2.5 py-0.5 rounded-full">
+                    <span className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-400 text-[11px] font-bold font-mono px-3 py-1 rounded-full">
                       {studentAlerts.length}
                     </span>
                   </div>
-
-                  <div className="space-y-3 max-h-[200px] overflow-y-auto scrollbar-thin pr-1">
+                  <div className="space-y-4 max-h-[300px] overflow-y-auto inner-scroll pr-2">
                     {studentAlerts.map((a: any) => (
-                      <div key={a.id} className={`p-4 rounded-xl border-l-4 shadow-sm font-body ${a.severity === 'high'
-                        ? 'bg-red-50/50 dark:bg-red-500/5 border-l-red-500 border-y-red-100 dark:border-y-red-500/10 border-r-red-100 dark:border-r-red-500/10'
+                      <div key={a.id} className={`p-5 rounded-2xl border-l-4 shadow-sm font-body ${a.severity === 'high'
+                        ? 'bg-rose-50/50 dark:bg-rose-500/5 border-l-rose-500 border-y-rose-100 dark:border-y-rose-500/10 border-r-rose-100 dark:border-r-rose-500/10'
                         : 'bg-amber-50/50 dark:bg-amber-500/5 border-l-amber-500 border-y-amber-100 dark:border-y-amber-500/10 border-r-amber-100 dark:border-r-amber-500/10'
                         }`}>
-                        <p className={`text-[13px] font-bold ${a.severity === 'high' ? 'text-red-900 dark:text-red-400' : 'text-amber-900 dark:text-amber-400'}`}>
+                        <p className={`text-[14px] font-bold font-display tracking-wide ${a.severity === 'high' ? 'text-rose-900 dark:text-rose-400' : 'text-amber-900 dark:text-amber-400'}`}>
                           {a.trigger_name}
                         </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-sm opacity-60">⏱</span>
-                          <p className={`text-[11px] font-bold font-display uppercase tracking-wider ${a.severity === 'high' ? 'text-red-600 dark:text-red-500' : 'text-amber-700 dark:text-amber-500'}`}>
+                        <div className="flex items-center gap-2 mt-2.5">
+                          <p className={`text-[10px] font-bold font-mono uppercase tracking-widest ${a.severity === 'high' ? 'text-rose-600 dark:text-rose-500' : 'text-amber-700 dark:text-amber-500'}`}>
                             Due: {a.deadline}
                           </p>
                         </div>
@@ -291,10 +287,11 @@ export function StudentDetailPage() {
                     ))}
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
           </div>
+
         </div>
       </div>
     </>

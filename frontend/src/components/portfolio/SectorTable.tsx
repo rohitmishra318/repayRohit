@@ -1,4 +1,3 @@
-
 import type { SectorExposure } from '../../types';
 
 interface Props { data: SectorExposure[] }
@@ -23,12 +22,12 @@ export function SectorTable({ data }: Props) {
 
       {/* ── Column header ── */}
       <div className="grid grid-cols-[2.5fr_4fr_100px_100px] gap-4 items-center
-                      px-4 pb-3 mb-1
+                      px-4 pb-3 mb-2
                       border-b border-slate-100 dark:border-white/5">
         {['Field', 'Risk Distribution', 'Avg Score', 'Students'].map((h, i) => (
           <p key={h}
             className={`text-[9px] font-bold uppercase tracking-[0.15em]
-                        text-slate-400 dark:text-white/20 font-body
+                        text-slate-400 dark:text-white/30 font-body
                         ${i >= 2 ? 'text-right' : ''}`}>
             {h}
           </p>
@@ -36,13 +35,14 @@ export function SectorTable({ data }: Props) {
       </div>
 
       {/* ── Rows ── */}
-      <div className="space-y-0.5">
+      <div className="space-y-1">
         {sorted.slice(0, 19).map((s, idx) => {
           const pct = s.avg_risk * 100;
           const isHigh = s.avg_risk >= 0.75;
           const isMid = s.avg_risk >= 0.55;
 
-          const riskCls = isHigh ? 'high-risk' : isMid ? 'medium-risk' : 'low-risk';
+          // Note: Removed the riskCls calculation as it was only used for the left border
+
           const barColor = isHigh ? 'bg-red-500' : isMid ? 'bg-amber-400' : 'bg-emerald-500';
           const barGlow = isHigh
             ? 'shadow-[0_0_8px_rgba(239,68,68,0.5)]'
@@ -63,22 +63,23 @@ export function SectorTable({ data }: Props) {
           return (
             <div
               key={s.field}
-              className={`sector-row ${riskCls}
-                          grid grid-cols-[2.5fr_4fr_100px_100px] gap-4 items-center
-                          px-4 py-3 rounded-xl`}
+              // Removed `sector-row` and `${riskCls}` here
+              className={`grid grid-cols-[2.5fr_4fr_100px_100px] gap-4 items-center
+                          px-4 py-3 rounded-xl transition-colors
+                          hover:bg-slate-50/50 dark:hover:bg-white/[0.02]`}
               style={{ animationDelay: `${idx * 35}ms` }}
             >
               {/* Field name */}
-              <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
                 {/* Rank number */}
-                <span className="shrink-0 w-5 h-5 rounded-md
+                <span className="shrink-0 w-6 h-6 rounded-md
                                  bg-slate-100 dark:bg-white/5
-                                 text-[10px] font-bold text-slate-400 dark:text-white/20
+                                 text-[10px] font-bold text-slate-500 dark:text-white/40
                                  flex items-center justify-center font-mono">
-                  {idx + 1}
+                  {(idx + 1).toString().padStart(2, '0')}
                 </span>
-                <span className="text-[13px] font-semibold text-slate-700 dark:text-white/80
-                                 truncate font-body"
+                <span className="text-[13px] font-semibold text-slate-700 dark:text-white/90
+                                 truncate font-display tracking-wide"
                   title={s.field}>
                   {s.field}
                 </span>
@@ -98,8 +99,8 @@ export function SectorTable({ data }: Props) {
                   />
                 </div>
                 {/* Risk tier badge */}
-                <span className={`shrink-0 text-[9px] font-bold uppercase tracking-wider
-                                  px-2 py-0.5 rounded-full border font-body ${badgeBg}`}>
+                <span className={`shrink-0 text-[9px] font-bold uppercase tracking-widest
+                                  px-2.5 py-1 rounded-md border font-body ${badgeBg}`}>
                   {isHigh ? 'HIGH' : isMid ? 'MED' : 'LOW'}
                 </span>
               </div>
@@ -111,10 +112,10 @@ export function SectorTable({ data }: Props) {
 
               {/* Student count */}
               <div className="text-right">
-                <span className="text-[13px] font-semibold text-slate-600 dark:text-white/50 font-body">
+                <span className="text-[13px] font-bold text-slate-700 dark:text-white/70 font-mono">
                   {s.student_count.toLocaleString()}
                 </span>
-                <span className="text-[10px] text-slate-400 dark:text-white/20 ml-1 font-body">
+                <span className="text-[10px] text-slate-400 dark:text-white/30 ml-1.5 font-body uppercase tracking-wider">
                   students
                 </span>
               </div>

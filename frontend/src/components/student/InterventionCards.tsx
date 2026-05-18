@@ -1,6 +1,9 @@
 import type { Intervention } from '../../types';
 
-interface Props { interventions: Intervention[] }
+interface Props {
+  interventions: Intervention[];
+  layout?: 'list' | 'grid';
+}
 
 // Added dark mode text, subtle backgrounds, and border colors for the badges
 const costColor: Record<string, string> = {
@@ -15,11 +18,11 @@ const formatCategory = (str: string) => {
   return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-export function InterventionCards({ interventions }: Props) {
+export function InterventionCards({ interventions, layout = 'list' }: Props) {
   if (!interventions?.length) return <p className="text-sm text-slate-400 dark:text-slate-500">No recommendations available</p>;
 
   return (
-    <div className="space-y-3">
+    <div className={layout === 'grid' ? "grid grid-cols-1 md:grid-cols-3 gap-4" : "space-y-3"}>
       {interventions.slice(0, 3).map((item, i) => {
         // Use adjusted_lift_pp from the new backend data
         const lift = item.adjusted_lift_pp ? `+${item.adjusted_lift_pp}pp` : '';

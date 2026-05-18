@@ -279,12 +279,12 @@ export function AdminDashboard() {
                   <thead>
                     <tr className="bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-200/60 dark:border-white/5">
                       {[
-                        /* Replaced strict w-32/w-40 with proportional percentages */
-                        { label: 'Name', w: 'w-[30%]' },
-                        { label: 'Course', w: 'w-[15%]' },
-                        { label: 'Field', w: 'w-[25%]' },
-                        { label: 'Status', w: 'w-[15%]' },
-                        { label: 'Risk', w: 'w-[15%]' },
+                        // Changed 'Name' to '#' and adjusted widths slightly to accommodate a serial column
+                        { label: 'S.No', w: 'w-[10%]' },
+                        { label: 'Course', w: 'w-[20%]' },
+                        { label: 'Field', w: 'w-[30%]' },
+                        { label: 'Status', w: 'w-[20%]' },
+                        { label: 'Risk', w: 'w-[20%]' },
                       ].map(h => (
                         <th key={h.label}
                           className={`${h.w} px-8 py-4 text-left text-[11px] font-bold
@@ -298,18 +298,13 @@ export function AdminDashboard() {
 
                   <tbody>
                     {students?.slice(0, visibleCount).map((s, idx) => {
-                      const riskClass =
-                        s.risk_tier === 'HIGH' ? 'risk-high'
-                          : s.risk_tier === 'MEDIUM' ? 'risk-medium'
-                            : 'risk-low';
-
                       return (
                         <tr
                           key={s.student_id}
                           onClick={() => navigate(`/student/${s.student_id}`)}
-                          className={`borrow-row cursor-pointer transition-all duration-200
+                          className={`cursor-pointer transition-all duration-200
                             border-b border-slate-100 dark:border-white/[0.03] last:border-0
-                            ${riskClass}
+                            /* REMOVED the  logic here which was injecting the colored left border */
                             ${idx % 2 === 0
                               ? 'bg-white dark:bg-transparent'
                               : 'bg-slate-50/40 dark:bg-white/[0.01]'}
@@ -317,14 +312,11 @@ export function AdminDashboard() {
                             hover:shadow-[inset_0_0_0_1px_rgba(139,92,246,0.12)] dark:hover:shadow-[inset_0_0_0_1px_rgba(139,92,246,0.2)]
                           `}
                         >
-                          {/* Name - Removed min-w/w classes from all <td> elements */}
+                          {/* Serial Number (Replaced Name Column) */}
                           <td className="px-8 py-4">
-                            <p className="name-shimmer font-bold text-slate-800 dark:text-white text-sm font-display transition-all">
-                              {s.name}
-                            </p>
-                            <p className="text-[11px] text-slate-500 dark:text-white/40 mt-0.5 font-body font-medium">
-                              {s.institute_tier}
-                            </p>
+                            <span className="font-mono text-[13px] font-bold text-slate-400 dark:text-white/40">
+                              {(idx + 1).toString().padStart(2, '0')}
+                            </span>
                           </td>
 
                           {/* Course */}
@@ -400,7 +392,6 @@ export function AdminDashboard() {
               )}
             </div>
           </div>
-
         </div>
       </div>
     </>

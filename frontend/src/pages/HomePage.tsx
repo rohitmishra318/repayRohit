@@ -432,20 +432,25 @@ export function HomePage() {
 
               {/* Tag line */}
               <div
-                className={`reveal-up`}
+                className="reveal-up antialiased"
                 style={{ animationDelay: '100ms', animationPlayState: revealed ? 'running' : 'paused' }}
               >
-                <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 mb-6">
-                  <span className="w-1.5 h-1.5 bg-violet-400 rounded-full" />
-                  <span className="text-xs text-violet-300 font-semibold font-body tracking-wide uppercase">AI-Powered Risk Platform</span>
+                {/* Technical System Badge */}
+                <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-3.5 py-1.5 mb-6">
+                  <span className="w-1.5 h-1.5 bg-violet-400 rounded-full shadow-[0_0_8px_rgba(167,139,250,0.5)]" />
+                  <span className="text-[10px] text-violet-300 font-bold font-mono tracking-[0.18em] uppercase">
+                    AI-Powered Risk Platform
+                  </span>
                 </div>
 
-                <h1 className="font-display text-5xl xl:text-6xl font-extrabold leading-[1.05] text-white mb-5">
+                {/* High-End Enterprise Heading */}
+                <h1 className="font-display text-5xl xl:text-6xl font-bold tracking-tighter leading-[1.1] text-white mb-6">
                   Smarter Lending<br />
-                  <span className="shimmer-text">through Career<br />Intelligence</span>
+                  <span className="shimmer-text tracking-tighter">through Career Intelligence</span>
                 </h1>
 
-                <p className="text-white/45 text-lg font-body leading-relaxed max-w-lg">
+                {/* Crisp, Highly Readable Paragraph */}
+                <p className="text-white/60 text-[17px] font-body leading-relaxed max-w-lg font-normal">
                   Predict placement timelines, salary trajectories, and repayment risk for education loan portfolios using live career signals.
                 </p>
               </div>
@@ -460,7 +465,7 @@ export function HomePage() {
                   {[
                     { value: `${c1}%`, label: 'Prediction Accuracy', color: 'text-violet-300' },
                     { value: c2.toLocaleString(), label: 'Active Borrowers', color: 'text-sky-300' },
-                    { value: `${c3}s`, label: 'Avg Risk Score Time', color: 'text-emerald-300' },
+                    { value: `${c3}S`, label: 'Avg Risk Score Time', color: 'text-emerald-300' },
                   ].map((s) => (
                     <div key={s.label} className="glass-panel rounded-2xl p-4 text-center">
                       <div className={`font-display text-2xl font-bold ${s.color} mb-1`}>{s.value}</div>
@@ -559,6 +564,17 @@ export function HomePage() {
               className={`reveal-up`}
               style={{ animationDelay: '180ms', animationPlayState: revealed ? 'running' : 'paused' }}
             >
+              {/* Why Repay Signal Button */}
+              <button
+                onClick={() => navigate('/about')}
+                className="w-full mb-4 py-3 text-xs font-bold uppercase tracking-[0.15em] text-violet-400 bg-violet-500/10 border border-violet-500/20 rounded-xl hover:bg-violet-500/20 hover:text-violet-300 transition-all font-display flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(124,58,237,0.05)] cursor-pointer"
+              >
+                <span>Why Repay Signal</span>
+                <svg className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
               <div className="panel-glow glass-panel rounded-3xl p-8 relative overflow-hidden">
                 {/* Panel inner glow */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-violet-500/40 to-transparent" />

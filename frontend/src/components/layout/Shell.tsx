@@ -224,15 +224,6 @@ export function Shell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </div>
-
-          {/* ── Section label ── */}
-          <div className="px-5 mb-2">
-            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-300 dark:text-white/15 font-body">
-              Navigation
-            </p>
-          </div>
-
-          {/* ── Nav links ── */}
           <nav className="flex-1 px-3 space-y-0.5">
             {nav.map((link, i) => (
               <NavLink
@@ -255,9 +246,6 @@ export function Shell({ children }: { children: ReactNode }) {
 
           {/* ── Theme toggle ── */}
           <div className="px-5 pb-3">
-            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-300 dark:text-white/15 font-body mb-2.5">
-              Appearance
-            </p>
             <button
               onClick={toggleTheme}
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl

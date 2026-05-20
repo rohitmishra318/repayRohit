@@ -161,8 +161,13 @@ export function StudentDetailPage() {
 
             {/* Risk Gauge */}
             <div className="glass-card rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden card-reveal h-full" style={{ animationDelay: '100ms' }}>
-              <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-6">Current Risk Score</h2>
+              {/* Centered the header using text-center */}
+              <h2 className="text-lg font-bold font-display tracking-tight text-slate-800 dark:text-white mb-6 text-center">
+                Current Risk Score
+              </h2>
+
               <RiskGauge score={risk.risk_score} label={`CI: ${(risk.ci_lower * 100).toFixed(0)}%–${(risk.ci_upper * 100).toFixed(0)}%`} />
+
               {risk.needs_human_review && (
                 <div className="mt-6 bg-amber-50/80 dark:bg-amber-900/10 border border-amber-200/80 dark:border-amber-800/30 rounded-2xl p-4 text-[12px] text-amber-800 dark:text-amber-400/90 flex items-start gap-3">
                   <span className="text-lg leading-none">⚠</span>

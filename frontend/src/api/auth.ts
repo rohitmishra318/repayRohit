@@ -41,6 +41,7 @@ export interface CreateStudentData {
   loan_emi_monthly: number;
   tenth_board_score?: number;
   twelfth_board_score?: number;
+  city?: string;
 }
 
 /**

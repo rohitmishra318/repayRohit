@@ -176,18 +176,24 @@ export function AdminDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  {Object.keys(students?.reduce((acc, s) => {
-                    // count unique inferred states — reuse same hash
-                    let hash = 0;
-                    const str = s.student_id || '';
-                    for (let i = 0; i < str.length; i++) {
-                      hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                      hash = hash & hash;
-                    }
-                    const stateKeys = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Puducherry', 'Jammu & Kashmir'];
-                    acc[stateKeys[Math.abs(hash) % stateKeys.length]] = true;
-                    return acc;
-                  }, {} as Record<string, boolean>) || {}).length} states
+                  {(() => {
+                    const locations = new Set<string>();
+                    const STATE_KEYS = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Puducherry', 'Jammu & Kashmir'];
+                    students?.forEach(s => {
+                      if (s.city && s.city !== 'Other') {
+                        locations.add(s.city);
+                      } else {
+                        let hash = 0;
+                        const str = s.student_id || '';
+                        for (let i = 0; i < str.length; i++) {
+                          hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                          hash = hash & hash;
+                        }
+                        locations.add(STATE_KEYS[Math.abs(hash) % STATE_KEYS.length]);
+                      }
+                    });
+                    return locations.size;
+                  })()} locations
                 </div>
               </div>
               <div className="p-4 min-h-[420px]">

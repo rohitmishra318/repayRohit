@@ -36,6 +36,7 @@ class Student(Base):
     twelfth_board_score = Column("12th_board_score", Float, nullable=True)
     months_since_graduation = Column(Integer, default=0)
     placement_status = Column(String(20), default="searching")
+    city = Column(String(100), nullable=True)
 
 
 class Outcome(Base):

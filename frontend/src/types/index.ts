@@ -49,6 +49,7 @@ interface StudentListItem {
   months_since_graduation: number;
   placement_status: 'placed' | 'searching';
   institute_tier: string;
+  city?: string;
 }
 
 interface StudentDetail extends StudentListItem {

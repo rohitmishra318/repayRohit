@@ -14,7 +14,7 @@ interface FormData {
   password: string;
   confirmPassword: string;
   name: string;
-  
+
   // Education
   instituteName: string;
   instituteTier: 'tier_1' | 'tier_2' | 'tier_3';
@@ -23,28 +23,31 @@ interface FormData {
   cgpa: number;
   tenthBoardScore?: number;
   twelfthBoardScore?: number;
-  
+
   // Work Experience
   internshipCount: number;
   internshipEmployerTier: 'recognized' | 'unverified' | 'none';
   ppoExists: boolean;
   certCount: number;
-  
+
   // Graduation & Target
   graduationMonth: number;
   graduationYear: number;
   targetField: string;
   targetCityTier: 1 | 2 | 3;
-  
+
   // Loan
   loanEmiMonthly: number;
+
+  // Location
+  city: string;
 }
 
 export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
   const [step, setStep] = useState<'basic' | 'education' | 'experience' | 'target' | 'loan'>('basic');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -64,31 +67,32 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
     targetField: '',
     targetCityTier: 2,
     loanEmiMonthly: 0,
+    city: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.currentTarget;
-    
+
     // Handle checkboxes separately
     if (type === 'checkbox') {
       const checked = (e.currentTarget as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
       return;
     }
-    
+
     // Handle number inputs
     if (type === 'number') {
       setFormData(prev => ({ ...prev, [name]: parseFloat(value) }));
       return;
     }
-    
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     // Validate passwords
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -105,7 +109,7 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
     try {
       // Register with Firebase
       const firebaseUser = await registerWithFirebase(formData.email, formData.password);
-      
+
       // Create student record in backend
       await createStudent({
         firebase_uid: firebaseUser.uid,
@@ -127,8 +131,9 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
         loan_emi_monthly: formData.loanEmiMonthly,
         tenth_board_score: formData.tenthBoardScore,
         twelfth_board_score: formData.twelfthBoardScore,
+        city: formData.city || undefined,
       });
-      
+
       onSuccess();
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
@@ -165,11 +170,10 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
             {['basic', 'education', 'experience', 'target', 'loan'].map((s, i) => (
               <div
                 key={s}
-                className={`flex-1 h-1 rounded-full transition-all ${
-                  ['basic', 'education', 'experience', 'target', 'loan'].indexOf(step) >= i
-                    ? 'bg-blue-600'
-                    : 'bg-slate-200'
-                }`}
+                className={`flex-1 h-1 rounded-full transition-all ${['basic', 'education', 'experience', 'target', 'loan'].indexOf(step) >= i
+                  ? 'bg-blue-600'
+                  : 'bg-slate-200'
+                  }`}
               />
             ))}
           </div>
@@ -179,7 +183,7 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
       {/* Form Container */}
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-6">
-          
+
           {/* Heading */}
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold text-slate-900">
@@ -200,7 +204,7 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-blue-100 p-8 space-y-5">
-            
+
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
@@ -469,6 +473,45 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
                 </div>
 
                 <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">Your City</label>
+                  <select
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  >
+                    <option value="">Select your city...</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Bengaluru">Bengaluru</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
+                    <option value="Jaipur">Jaipur</option>
+                    <option value="Lucknow">Lucknow</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Bhopal">Bhopal</option>
+                    <option value="Nagpur">Nagpur</option>
+                    <option value="Coimbatore">Coimbatore</option>
+                    <option value="Kochi">Kochi</option>
+                    <option value="Indore">Indore</option>
+                    <option value="Patna">Patna</option>
+                    <option value="Bhubaneswar">Bhubaneswar</option>
+                    <option value="Visakhapatnam">Visakhapatnam</option>
+                    <option value="Thiruvananthapuram">Thiruvananthapuram</option>
+                    <option value="Guwahati">Guwahati</option>
+                    <option value="Dehradun">Dehradun</option>
+                    <option value="Ranchi">Ranchi</option>
+                    <option value="Raipur">Raipur</option>
+                    <option value="Srinagar">Srinagar</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">Expected Graduation</label>
                   <div className="grid grid-cols-2 gap-3">
                     <select
@@ -546,7 +589,7 @@ export function SignupForm({ onSuccess, onBackClick }: SignupFormProps) {
                   Back
                 </button>
               )}
-              
+
               <button
                 type={step === 'loan' ? 'submit' : 'button'}
                 onClick={() => {

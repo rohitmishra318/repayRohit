@@ -33,6 +33,7 @@ class StudentRegistrationData(BaseModel):
     loan_emi_monthly: float
     tenth_board_score: Optional[float] = None
     twelfth_board_score: Optional[float] = None
+    city: Optional[str] = None
 
 
 def extract_firebase_uid_from_token(token: str) -> str:
@@ -139,6 +140,7 @@ async def register_student(
             twelfth_board_score=data.twelfth_board_score,
             months_since_graduation=0,
             placement_status="searching",
+            city=data.city,
         )
         db.add(student)
         db.flush()
@@ -225,6 +227,7 @@ async def get_current_user(
                 "placement_status": student.placement_status,
                 "months_since_graduation": student.months_since_graduation,
                 "institute_tier": institute.tier if institute else None,
+                "city": student.city,
                 "institute_id": str(institute.institute_id) if institute else None,
             }
 

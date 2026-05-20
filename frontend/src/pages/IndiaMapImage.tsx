@@ -6,6 +6,42 @@ import { useTheme } from '../context/ThemeContext';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
+/**
+ * City-level coordinates for accurate geographic mapping.
+ * Students with a `city` field are placed here directly.
+ */
+const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
+  'Mumbai': { lat: 19.076, lng: 72.878 },
+  'Delhi': { lat: 28.704, lng: 77.103 },
+  'Bengaluru': { lat: 12.972, lng: 77.595 },
+  'Chennai': { lat: 13.083, lng: 80.271 },
+  'Hyderabad': { lat: 17.385, lng: 78.487 },
+  'Pune': { lat: 18.520, lng: 73.857 },
+  'Kolkata': { lat: 22.573, lng: 88.364 },
+  'Ahmedabad': { lat: 23.023, lng: 72.571 },
+  'Jaipur': { lat: 26.912, lng: 75.787 },
+  'Lucknow': { lat: 26.847, lng: 80.946 },
+  'Chandigarh': { lat: 30.733, lng: 76.779 },
+  'Bhopal': { lat: 23.260, lng: 77.413 },
+  'Nagpur': { lat: 21.146, lng: 79.088 },
+  'Coimbatore': { lat: 11.017, lng: 76.956 },
+  'Kochi': { lat: 9.931, lng: 76.267 },
+  'Indore': { lat: 22.720, lng: 75.858 },
+  'Patna': { lat: 25.612, lng: 85.145 },
+  'Bhubaneswar': { lat: 20.296, lng: 85.825 },
+  'Visakhapatnam': { lat: 17.687, lng: 83.218 },
+  'Thiruvananthapuram': { lat: 8.524, lng: 76.936 },
+  'Guwahati': { lat: 26.148, lng: 91.736 },
+  'Dehradun': { lat: 30.317, lng: 78.032 },
+  'Ranchi': { lat: 23.344, lng: 85.310 },
+  'Raipur': { lat: 21.251, lng: 81.630 },
+  'Srinagar': { lat: 34.084, lng: 74.797 },
+};
+
+/**
+ * State-level fallback coordinates for legacy/synthetic students
+ * without a city field. Used with the hash-based distribution.
+ */
 const STATE_COORDS: Record<string, { lat: number; lng: number; abbr: string }> = {
   'Andhra Pradesh': { lat: 15.91, lng: 79.74, abbr: 'AP' },
   'Arunachal Pradesh': { lat: 28.21, lng: 94.72, abbr: 'AR' },
@@ -40,10 +76,14 @@ const STATE_COORDS: Record<string, { lat: number; lng: number; abbr: string }> =
   'Jammu & Kashmir': { lat: 33.77, lng: 76.57, abbr: 'JK' },
 };
 
+/**
+ * For legacy students without a city, hash their ID to a state name.
+ */
 function inferState(student: StudentListItem): string {
   const states = Object.keys(STATE_COORDS);
   let hash = 0;
   const str = student.student_id || '';
+  console.log(str.length);
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash = hash & hash;
@@ -51,32 +91,51 @@ function inferState(student: StudentListItem): string {
   return states[Math.abs(hash) % states.length];
 }
 
+/**
+ * Resolve a student to a location label + coordinates.
+ * - If the student has a known city → use city coords
+ * - Otherwise → fallback to hash-based state coords
+ */
+function resolveLocation(student: StudentListItem): { label: string; lat: number; lng: number } {
+  if (student.city && student.city !== 'Other' && CITY_COORDS[student.city]) {
+    const c = CITY_COORDS[student.city];
+    return { label: student.city, lat: c.lat, lng: c.lng };
+  }
+  // Fallback: hash-based state assignment for legacy students
+  const state = inferState(student);
+  const sc = STATE_COORDS[state];
+  return { label: state, lat: sc.lat, lng: sc.lng };
+}
+
 export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
   const { theme } = useTheme();
   const mapRef = useRef<any>(null);
-  const [hoveredState, setHoveredState] = useState<string | null>(null);
+  const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
 
-  const stateStats = useMemo(() => {
-    const groups: Record<string, StudentListItem[]> = {};
+  const locationStats = useMemo(() => {
+    const groups: Record<string, { students: StudentListItem[]; lat: number; lng: number }> = {};
     students.forEach(s => {
-      const st = inferState(s);
-      if (!groups[st]) groups[st] = [];
-      groups[st].push(s);
+      const loc = resolveLocation(s);
+      if (!groups[loc.label]) {
+        groups[loc.label] = { students: [], lat: loc.lat, lng: loc.lng };
+      }
+      groups[loc.label].students.push(s);
     });
 
-    const out: Record<string, any> = {};
-    Object.entries(groups).forEach(([st, list]) => {
-      const scores = list.map(s => s.risk_score || 0);
-      out[st] = {
-        count: list.length,
+    const out: Record<string, { count: number; avgRisk: number; lat: number; lng: number }> = {};
+    Object.entries(groups).forEach(([label, data]) => {
+      const scores = data.students.map(s => s.risk_score || 0);
+      out[label] = {
+        count: data.students.length,
         avgRisk: scores.reduce((a, b) => a + b, 0) / scores.length,
+        lat: data.lat,
+        lng: data.lng,
       };
     });
     return out;
   }, [students]);
 
-  const maxCount = Math.max(...Object.values(stateStats).map((s: any) => s.count), 1);
-
+  const maxCount = Math.max(...Object.values(locationStats).map(s => s.count), 1);
 
   return (
     <>
@@ -130,10 +189,7 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
         >
           <NavigationControl position="top-right" />
 
-          {Object.entries(STATE_COORDS).map(([name, coord]) => {
-            const stats = stateStats[name];
-            if (!stats || stats.count === 0) return null;
-
+          {Object.entries(locationStats).map(([name, stats]) => {
             const isHigh = stats.avgRisk >= 0.75;
             const isMid = stats.avgRisk >= 0.55;
             const coreColor = isHigh ? '#ef4444' : isMid ? '#f59e0b' : '#34d399';
@@ -141,11 +197,11 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
 
             return (
               <React.Fragment key={name}>
-                <Marker longitude={coord.lng} latitude={coord.lat} anchor="center">
+                <Marker longitude={stats.lng} latitude={stats.lat} anchor="center">
                   <div
                     className="relative cursor-pointer group"
-                    onMouseEnter={() => setHoveredState(name)}
-                    onMouseLeave={() => setHoveredState(null)}
+                    onMouseEnter={() => setHoveredLocation(name)}
+                    onMouseLeave={() => setHoveredLocation(null)}
                   >
                     <div
                       className="ripple"
@@ -169,16 +225,16 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
                   </div>
                 </Marker>
 
-                {hoveredState === name && (
+                {hoveredLocation === name && (
                   <Popup
-                    longitude={coord.lng}
-                    latitude={coord.lat}
+                    longitude={stats.lng}
+                    latitude={stats.lat}
                     anchor="bottom"
                     closeButton={false}
                     offsetTop={-size}
                   >
                     <div className="font-display">
-                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">State Details</p>
+                      <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">Location Details</p>
                       <h3 className="font-bold text-sm text-white dark:text-white mb-2">{name}</h3>
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-xs text-slate-300">Borrowers</span>

@@ -54,6 +54,7 @@ async def list_students(
             "months_since_graduation": s.months_since_graduation,
             "placement_status": s.placement_status,
             "institute_tier": inst.tier if inst else None,
+            "city": s.city,
         })
 
     return result
@@ -81,6 +82,7 @@ async def get_student(student_id: str, db: Session = Depends(get_db)):
         "placement_status": student.placement_status,
         "institute_tier": institute.tier if institute else None,
         "data_trust_score": float(institute.data_trust_score if institute else 0.5),
+        "city": student.city,
     }
 
 

@@ -19,6 +19,7 @@ class StudentUpdate(BaseModel):
     target_field: Optional[str] = None
     target_city_tier: Optional[int] = None
     months_since_graduation: Optional[int] = None
+    city: Optional[str] = None
 
 class StudentResponse(BaseModel):
     student_id: str

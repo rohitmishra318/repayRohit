@@ -28,9 +28,17 @@ async def list_students(
     }
     institutes_map = {str(i.institute_id): i for i in db.query(Institute).all()}
 
+    from backend.services.risk_service import score_student
+    
     result = []
     for s in students:
-        score = scores_map.get(str(s.student_id), 0.5)
+        score = scores_map.get(str(s.student_id))
+        
+        if score is None:
+            risk_data = await score_student(str(s.student_id), db)
+            score = risk_data["risk_score"]
+            scores_map[str(s.student_id)] = score
+            
         tier = get_risk_tier(score)
         if risk_tier and tier != risk_tier:
             continue

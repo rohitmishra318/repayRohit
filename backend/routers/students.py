@@ -14,7 +14,7 @@ router = APIRouter()
 async def list_students(
     course_family: Optional[str] = None,
     risk_tier: Optional[str] = None,
-    limit: int = Query(default=50, le=2000),
+    limit: int = Query(default=200, le=5000),
     db: Session = Depends(get_db),
 ):
     query = db.query(Student)

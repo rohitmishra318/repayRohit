@@ -106,6 +106,7 @@ function resolveLocation(student: StudentListItem): { label: string; lat: number
 }
 
 export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
+  console.log("data", students);
   const { theme } = useTheme();
   const mapRef = useRef<any>(null);
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
@@ -146,7 +147,7 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
         .ripple {
           position: absolute;
           border-radius: 50%;
-          animation: ripple 2s ease-out infinite;
+          animation: ripple 1s ease-out infinite;
         }
         .mapboxgl-popup-content {
           background: rgba(18, 18, 31, 0.9) !important;
@@ -191,7 +192,7 @@ export function IndiaMapImage({ students }: { students: StudentListItem[] }) {
             const isHigh = stats.avgRisk >= 0.75;
             const isMid = stats.avgRisk >= 0.55;
             const coreColor = isHigh ? '#ef4444' : isMid ? '#f59e0b' : '#34d399';
-            const size = 8 + (stats.count / maxCount) * 16;
+            const size = 2 + (stats.count / maxCount) * 10;
 
             return (
               <React.Fragment key={name}>

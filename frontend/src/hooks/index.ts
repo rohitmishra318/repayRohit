@@ -15,7 +15,7 @@ export function usePortfolio() {
 export function useStudents(filters?: { course_family?: string; risk_tier?: string }) {
   return useQuery({
     queryKey: ['students', filters],
-    queryFn: () => api.getStudents({ ...filters, limit: 200 }),
+    queryFn: () => api.getStudents({ ...filters, limit: 2500 }),
     staleTime: 30_000,
   });
 }

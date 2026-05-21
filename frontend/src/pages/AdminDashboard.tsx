@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePortfolio, useStudents } from '../hooks';
 import { PageHeader } from '../components/layout/PageHeader';
@@ -22,8 +22,21 @@ export function AdminDashboard() {
   const { data: portfolio, isLoading: pLoading } = usePortfolio();
   const { data: students, isLoading: sLoading } = useStudents();
   const [visibleCount, setVisibleCount] = useState(50);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  console.log(students?.length);
+  const filteredList = useMemo(() => {
+    if (!students) return [];
+    if (!searchQuery) return students;
+    const q = searchQuery.toLowerCase();
+    return students.filter(s =>
+      (s.name || '').toLowerCase().includes(q) ||
+      (s.target_field || '').toLowerCase().includes(q) ||
+      (s.course_type || '').toLowerCase().includes(q) ||
+      (s.course_family || '').toLowerCase().includes(q)
+    );
+  }, [students, searchQuery]);
+
+  console.log("numberofstudents", students?.length);
   if (pLoading || sLoading) return <Spinner label="Loading portfolio..." size="lg" />;
   if (!portfolio)
     return <p className="p-6 text-slate-400 dark:text-slate-500">Failed to load portfolio data.</p>;
@@ -195,6 +208,7 @@ export function AdminDashboard() {
 
                     students?.forEach(s => {
                       if (s.city && s.city !== 'Other' && CITY_TO_STATE[s.city]) {
+
                         locations.add(CITY_TO_STATE[s.city]);
                       } else {
                         let hash = 0;
@@ -274,8 +288,9 @@ export function AdminDashboard() {
             <div className="glass-card rounded-3xl overflow-hidden">
 
               {/* Table header */}
-              <div className="flex items-center justify-between px-8 py-6
-                              border-b border-slate-200/60 dark:border-white/10">
+              {/* Table header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between px-8 py-6
+                              border-b border-slate-200/60 dark:border-white/10 gap-4">
                 <div>
                   <h2 className="text-xl font-bold font-display tracking-tight text-slate-900 dark:text-white">
                     Borrower List
@@ -284,13 +299,30 @@ export function AdminDashboard() {
                     Click any row to open full risk profile
                   </p>
                 </div>
-                <span className="text-xs font-bold font-body tracking-wide
-                                 text-slate-500 dark:text-white/60
-                                 bg-slate-100 dark:bg-white/5
-                                 border border-slate-200 dark:border-white/10
-                                 px-4 py-2 rounded-full shadow-sm dark:shadow-none">
-                  Showing {Math.min(visibleCount, students?.length || 0)} of {students?.length}
-                </span>
+
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  {/* Search Input */}
+                  <div className="relative w-full sm:w-auto">
+                    <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Search name, field, course..."
+                      value={searchQuery}
+                      onChange={(e) => { setSearchQuery(e.target.value); setVisibleCount(50); }}
+                      className="pl-9 pr-4 py-2 w-full sm:w-64 text-sm font-body bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30"
+                    />
+                  </div>
+
+                  <span className="text-xs font-bold font-body tracking-wide
+                                   text-slate-500 dark:text-white/60
+                                   bg-slate-100 dark:bg-white/5
+                                   border border-slate-200 dark:border-white/10
+                                   px-4 py-2 rounded-full shadow-sm dark:shadow-none whitespace-nowrap">
+                    Showing {Math.min(visibleCount, filteredList.length)} of {filteredList.length}
+                  </span>
+                </div>
               </div>
 
               {/* Column headers */}
@@ -317,7 +349,7 @@ export function AdminDashboard() {
                   </thead>
 
                   <tbody>
-                    {students?.slice(0, visibleCount).map((s, idx) => {
+                    {filteredList.slice(0, visibleCount).map((s, idx) => {
                       return (
                         <tr
                           key={s.student_id}
@@ -376,12 +408,12 @@ export function AdminDashboard() {
               </div>
 
               {/* Show More */}
-              {students && visibleCount < students.length && (
+              {visibleCount < filteredList.length && (
                 <div className="px-8 py-5 flex items-center justify-between
                                 border-t border-slate-200/60 dark:border-white/10
                                 bg-slate-50/80 dark:bg-white/[0.02]">
                   <span className="text-[13px] text-slate-500 dark:text-white/40 font-body font-medium">
-                    {students.length - visibleCount} more borrowers not shown
+                    {filteredList.length - visibleCount} more borrowers not shown
                   </span>
                   <button
                     onClick={handleShowMore}
@@ -402,11 +434,11 @@ export function AdminDashboard() {
               )}
 
               {/* All loaded state */}
-              {students && visibleCount >= students.length && students.length > 0 && (
+              {visibleCount >= filteredList.length && filteredList.length > 0 && (
                 <div className="px-8 py-5 text-center border-t border-slate-200/60 dark:border-white/10
                                 bg-slate-50/80 dark:bg-white/[0.02]">
                   <span className="text-[13px] font-medium text-slate-500 dark:text-white/40 font-body">
-                    All {students.length} borrowers loaded
+                    All {filteredList.length} borrowers loaded
                   </span>
                 </div>
               )}

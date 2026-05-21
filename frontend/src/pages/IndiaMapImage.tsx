@@ -7,35 +7,34 @@ import { useTheme } from '../context/ThemeContext';
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
 /**
- * City-level coordinates for accurate geographic mapping.
- * Students with a `city` field are placed here directly.
+ * Map cities to their corresponding states so students are grouped by State.
  */
-const CITY_COORDS: Record<string, { lat: number; lng: number }> = {
-  'Mumbai': { lat: 19.076, lng: 72.878 },
-  'Delhi': { lat: 28.704, lng: 77.103 },
-  'Bengaluru': { lat: 12.972, lng: 77.595 },
-  'Chennai': { lat: 13.083, lng: 80.271 },
-  'Hyderabad': { lat: 17.385, lng: 78.487 },
-  'Pune': { lat: 18.520, lng: 73.857 },
-  'Kolkata': { lat: 22.573, lng: 88.364 },
-  'Ahmedabad': { lat: 23.023, lng: 72.571 },
-  'Jaipur': { lat: 26.912, lng: 75.787 },
-  'Lucknow': { lat: 26.847, lng: 80.946 },
-  'Chandigarh': { lat: 30.733, lng: 76.779 },
-  'Bhopal': { lat: 23.260, lng: 77.413 },
-  'Nagpur': { lat: 21.146, lng: 79.088 },
-  'Coimbatore': { lat: 11.017, lng: 76.956 },
-  'Kochi': { lat: 9.931, lng: 76.267 },
-  'Indore': { lat: 22.720, lng: 75.858 },
-  'Patna': { lat: 25.612, lng: 85.145 },
-  'Bhubaneswar': { lat: 20.296, lng: 85.825 },
-  'Visakhapatnam': { lat: 17.687, lng: 83.218 },
-  'Thiruvananthapuram': { lat: 8.524, lng: 76.936 },
-  'Guwahati': { lat: 26.148, lng: 91.736 },
-  'Dehradun': { lat: 30.317, lng: 78.032 },
-  'Ranchi': { lat: 23.344, lng: 85.310 },
-  'Raipur': { lat: 21.251, lng: 81.630 },
-  'Srinagar': { lat: 34.084, lng: 74.797 },
+const CITY_TO_STATE: Record<string, string> = {
+  'Mumbai': 'Maharashtra',
+  'Delhi': 'Delhi',
+  'Bengaluru': 'Karnataka',
+  'Chennai': 'Tamil Nadu',
+  'Hyderabad': 'Telangana',
+  'Pune': 'Maharashtra',
+  'Kolkata': 'West Bengal',
+  'Ahmedabad': 'Gujarat',
+  'Jaipur': 'Rajasthan',
+  'Lucknow': 'Uttar Pradesh',
+  'Chandigarh': 'Punjab',
+  'Bhopal': 'Madhya Pradesh',
+  'Nagpur': 'Maharashtra',
+  'Coimbatore': 'Tamil Nadu',
+  'Kochi': 'Kerala',
+  'Indore': 'Madhya Pradesh',
+  'Patna': 'Bihar',
+  'Bhubaneswar': 'Odisha',
+  'Visakhapatnam': 'Andhra Pradesh',
+  'Thiruvananthapuram': 'Kerala',
+  'Guwahati': 'Assam',
+  'Dehradun': 'Uttarakhand',
+  'Ranchi': 'Jharkhand',
+  'Raipur': 'Chhattisgarh',
+  'Srinagar': 'Jammu & Kashmir',
 };
 
 /**
@@ -83,7 +82,6 @@ function inferState(student: StudentListItem): string {
   const states = Object.keys(STATE_COORDS);
   let hash = 0;
   const str = student.student_id || '';
-  console.log(str.length);
   for (let i = 0; i < str.length; i++) {
     hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash = hash & hash;
@@ -93,13 +91,13 @@ function inferState(student: StudentListItem): string {
 
 /**
  * Resolve a student to a location label + coordinates.
- * - If the student has a known city → use city coords
- * - Otherwise → fallback to hash-based state coords
+ * Maps valid cities to their respective State, or uses the hash fallback.
  */
 function resolveLocation(student: StudentListItem): { label: string; lat: number; lng: number } {
-  if (student.city && student.city !== 'Other' && CITY_COORDS[student.city]) {
-    const c = CITY_COORDS[student.city];
-    return { label: student.city, lat: c.lat, lng: c.lng };
+  if (student.city && student.city !== 'Other' && CITY_TO_STATE[student.city]) {
+    const state = CITY_TO_STATE[student.city];
+    const sc = STATE_COORDS[state];
+    return { label: state, lat: sc.lat, lng: sc.lng };
   }
   // Fallback: hash-based state assignment for legacy students
   const state = inferState(student);

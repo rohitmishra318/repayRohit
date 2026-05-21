@@ -23,6 +23,7 @@ export function AdminDashboard() {
   const { data: students, isLoading: sLoading } = useStudents();
   const [visibleCount, setVisibleCount] = useState(50);
 
+  console.log(students?.length);
   if (pLoading || sLoading) return <Spinner label="Loading portfolio..." size="lg" />;
   if (!portfolio)
     return <p className="p-6 text-slate-400 dark:text-slate-500">Failed to load portfolio data.</p>;
@@ -179,9 +180,22 @@ export function AdminDashboard() {
                   {(() => {
                     const locations = new Set<string>();
                     const STATE_KEYS = ['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Puducherry', 'Jammu & Kashmir'];
+
+                    const CITY_TO_STATE: Record<string, string> = {
+                      'Mumbai': 'Maharashtra', 'Delhi': 'Delhi', 'Bengaluru': 'Karnataka',
+                      'Chennai': 'Tamil Nadu', 'Hyderabad': 'Telangana', 'Pune': 'Maharashtra',
+                      'Kolkata': 'West Bengal', 'Ahmedabad': 'Gujarat', 'Jaipur': 'Rajasthan',
+                      'Lucknow': 'Uttar Pradesh', 'Chandigarh': 'Punjab', 'Bhopal': 'Madhya Pradesh',
+                      'Nagpur': 'Maharashtra', 'Coimbatore': 'Tamil Nadu', 'Kochi': 'Kerala',
+                      'Indore': 'Madhya Pradesh', 'Patna': 'Bihar', 'Bhubaneswar': 'Odisha',
+                      'Visakhapatnam': 'Andhra Pradesh', 'Thiruvananthapuram': 'Kerala',
+                      'Guwahati': 'Assam', 'Dehradun': 'Uttarakhand', 'Ranchi': 'Jharkhand',
+                      'Raipur': 'Chhattisgarh', 'Srinagar': 'Jammu & Kashmir',
+                    };
+
                     students?.forEach(s => {
-                      if (s.city && s.city !== 'Other') {
-                        locations.add(s.city);
+                      if (s.city && s.city !== 'Other' && CITY_TO_STATE[s.city]) {
+                        locations.add(CITY_TO_STATE[s.city]);
                       } else {
                         let hash = 0;
                         const str = s.student_id || '';
@@ -193,7 +207,7 @@ export function AdminDashboard() {
                       }
                     });
                     return locations.size;
-                  })()} locations
+                  })()} states
                 </div>
               </div>
               <div className="p-4 min-h-[420px]">

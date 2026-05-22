@@ -162,7 +162,7 @@ export function HomeAuthPanel() {
         onClick={() => navigate('/about')}
         className="w-full mb-4 py-3 text-xs font-bold uppercase tracking-[0.15em] text-violet-400 bg-violet-500/10 border border-violet-500/20 rounded-xl hover:bg-violet-500/20 hover:text-violet-300 transition-all font-display flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(124,58,237,0.05)] cursor-pointer"
       >
-        <span>Why Repay Signal</span>
+        <span>Why RepaySignal?</span>
         <svg className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
         </svg>

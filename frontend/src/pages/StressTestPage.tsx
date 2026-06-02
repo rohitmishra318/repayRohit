@@ -305,10 +305,10 @@ export function StressTestPage() {
               <circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4M12 8h.01" />
             </svg>
             <p className="text-[11px] text-slate-500 dark:text-white/35 font-body leading-relaxed">
-              <strong className="font-bold text-slate-700 dark:text-white/60">Methodology:</strong> The simulator applies a multiplicative demand-shock factor
+              <strong className="font-bold text-slate-700 dark:text-white/60">Methodology:</strong> The simulator applies a multiplicative demand shock factor
               {' '}(<code className="font-mono text-[10px] bg-slate-100 dark:bg-white/5 px-1 py-0.5 rounded">1 − shock%/100</code>)
-              {' '}to each student's sector demand index, then re-evaluates XGBoost placement risk scores to count borrowers crossing the 0.75 high-risk threshold.
-              Results are estimates — actual portfolio impact depends on student-level profile diversity within the sector.
+              {' '}to each student's sector demand index, then re-evaluates XGBoost placement risk scores to count borrowers crossing the 0.75 high risk threshold.
+              Results are estimates actual portfolio impact depends on student level profile diversity within the sector.
             </p>
           </div>
 

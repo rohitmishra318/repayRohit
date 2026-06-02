@@ -208,7 +208,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div className="px-5 pt-6 pb-5">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600
-                              flex items-center justify-center shadow-lg shadow-violet-500/30 shrink-0">
+                              flex items-center justify-center shadow-lg shrink-0">
                 <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2}
                   strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                   <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />

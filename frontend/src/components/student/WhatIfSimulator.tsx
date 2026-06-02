@@ -75,10 +75,10 @@ export function WhatIfSimulator({ baseRisk, currentProfile }: Props) {
               disabled={disabled}
               onClick={() => toggle(action.id)}
               className={`text-left p-4 rounded-2xl border transition-all duration-200 animate-in fade-in zoom-in-95 group ${isSelected
-                  ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700/50 shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] dark:shadow-[inset_0_0_0_1px_rgba(139,92,246,0.2)]'
-                  : disabled
-                    ? 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 opacity-60 cursor-not-allowed'
-                    : 'bg-slate-50/80 dark:bg-white/[0.02] border-slate-200/60 dark:border-white/5 hover:border-violet-300 dark:hover:border-violet-500/50 hover:bg-white dark:hover:bg-white/[0.04]'
+                ? 'bg-violet-50 dark:bg-violet-900/20 border-violet-300 dark:border-violet-700/50 shadow-[inset_0_0_0_1px_rgba(139,92,246,0.1)] dark:shadow-[inset_0_0_0_1px_rgba(139,92,246,0.2)]'
+                : disabled
+                  ? 'bg-slate-50/50 dark:bg-white/[0.01] border-slate-100 dark:border-white/5 opacity-60 cursor-not-allowed'
+                  : 'bg-slate-50/80 dark:bg-white/[0.02] border-slate-200/60 dark:border-white/5 hover:border-violet-300 dark:hover:border-violet-500/50 hover:bg-white dark:hover:bg-white/[0.04]'
                 }`}
               style={{ animationDelay: `${i * 50}ms` }}
             >

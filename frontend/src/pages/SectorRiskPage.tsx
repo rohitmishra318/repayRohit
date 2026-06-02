@@ -67,11 +67,7 @@ export function SectorRiskPage() {
           box-shadow: none;
         }
 
-        /* stat card accents */
-        .stat-high   { border-top: 3px solid #ef4444; }
-        .stat-medium { border-top: 3px solid #f59e0b; }
-        .stat-low    { border-top: 3px solid #10b981; }
-        .stat-avg    { border-top: 3px solid #8b5cf6; }
+        
 
         /* sector row */
         .sector-row {

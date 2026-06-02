@@ -15,8 +15,6 @@ services:
     volumes:
       - ./models_cache:/app/models_cache
       - ./backend:/app/backend
-    depends_on:
-      - frontend
     networks:
       - repaysignal-network
     restart: unless-stopped

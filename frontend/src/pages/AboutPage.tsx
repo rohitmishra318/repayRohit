@@ -500,7 +500,7 @@ export function AboutPage() {
                 <span className="shimmer-text">Risk Engine</span>
               </h2>
               <p className="text-white/40 font-body max-w-xl mx-auto text-sm leading-relaxed">
-                RepaySignal doesn't replace credit scoring — it extends it with the dimension lenders were missing: career outcome probability.
+                RepaySignal doesn't replace credit scoring  it extends it with the dimension lenders were missing: career outcome probability.
               </p>
             </div>
           </Section>

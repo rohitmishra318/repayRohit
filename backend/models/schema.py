@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Float, Integer, Boolean, Date, JSON, Text, DateTime
+from sqlalchemy import Column, String, Float, Integer, Boolean, Date, Text, DateTime, Numeric
+from sqlalchemy.dialects.postgresql import JSONB
 from backend.database import Base
 import datetime
 
@@ -32,8 +33,10 @@ class Student(Base):
     has_profile_contradiction = Column(Boolean, default=False)
     is_scarred = Column(Boolean, default=False)
     is_demo = Column(Boolean, default=False)
-    tenth_board_score = Column("10th_board_score", Float, nullable=True)
-    twelfth_board_score = Column("12th_board_score", Float, nullable=True)
+    # Renamed from "10th_board_score" / "12th_board_score" to avoid
+    # digit-leading identifiers in PostgreSQL
+    tenth_board_score = Column(Float, nullable=True)
+    twelfth_board_score = Column(Float, nullable=True)
     months_since_graduation = Column(Integer, default=0)
     placement_status = Column(String(20), default="searching")
     city = Column(String(100), nullable=True)
@@ -62,7 +65,7 @@ class DemandIndex(Base):
     month = Column(Date)
     demand_percentile = Column(Float)
     mom_delta = Column(Float)
-    adjacent_sectors = Column(JSON)
+    adjacent_sectors = Column(JSONB)
 
 
 class ModelRegistry(Base):
@@ -91,8 +94,8 @@ class RiskScore(Base):
     predicted_salary_lower = Column(Float, nullable=True)
     predicted_salary_upper = Column(Float, nullable=True)
     repayment_stress_index = Column(Float, nullable=True)
-    shap_drivers = Column(JSON, nullable=True)
-    bias_flags = Column(JSON, nullable=True)
+    shap_drivers = Column(JSONB, nullable=True)
+    bias_flags = Column(JSONB, nullable=True)
     data_trust_weight = Column(Float)
     course_family = Column(String(20))
     regulatory_note = Column(String(500), nullable=True)
@@ -102,7 +105,7 @@ class RiskScore(Base):
 
 
 class AlertState(Base):
-    """Stores trigger alert states per student — state machine: monitoring → triggered → actioned → resolved."""
+    """Stores trigger alert states per student."""
     __tablename__ = "alert_states"
     id = Column(String(36), primary_key=True)
     student_id = Column(String(36))

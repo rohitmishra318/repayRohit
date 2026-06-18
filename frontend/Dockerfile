@@ -9,6 +9,10 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm ci
 
+# Set build argument for API URL so Vite can bake it into the code
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copy source code
 COPY . .
 
@@ -26,12 +30,12 @@ RUN npm install -g serve
 # Copy built assets from builder stage
 COPY --from=builder /app/dist ./dist
 
-# Expose port
-EXPOSE 3000
+# Expose the correct port
+EXPOSE 5173
 
-# Health check
+# Health check updated to match the new port
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:3000 || exit 1
+    CMD wget --quiet --tries=1 --spider http://localhost:5173 || exit 1
 
-# Run the application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Run the application on the correct port
+CMD ["serve", "-s", "dist", "-l", "5173"]

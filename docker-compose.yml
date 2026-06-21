@@ -1,7 +1,7 @@
 services:
   backend:
     build:
-      context: .
+      context:
       dockerfile: backend/Dockerfile
     container_name: repaysignal-backend
     ports:
@@ -29,7 +29,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_BASE_URL=http://152.67.175.191:8000
+        - VITE_API_BASE_URL=/api
     container_name: repaysignal-frontend
     ports:
       - "5173:5173"

@@ -89,7 +89,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         // User is logged in, fetch their student data from backend
         try {
           const token = await user.getIdToken();
-          const apiUrl = import.meta.env.VITE_API_BASE_URL || `${window.location.protocol}//${window.location.hostname}:8000`;
+          const apiUrl = import.meta.env.VITE_API_BASE_URL || '/api';
           const response = await fetch(`${apiUrl}/auth/me`, {
             method: 'GET',
             headers: {

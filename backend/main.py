@@ -37,3 +37,7 @@ app.include_router(alerts.router, prefix="/alerts", tags=["alerts"])
 @app.get("/")
 def root():
     return {"status": "RepaySignal API running", "version": "1.0.0"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
